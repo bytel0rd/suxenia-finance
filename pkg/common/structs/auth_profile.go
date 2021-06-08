@@ -13,6 +13,10 @@ type AuthProfile struct {
 	OrgId       *string
 }
 
+func (profile *AuthProfile) Validate() error {
+	return nil
+}
+
 func (profile *AuthProfile) IsValid() bool {
 	return true
 }
