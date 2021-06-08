@@ -17,6 +17,10 @@ func (e *APIException) GetMessage() string {
 	return e.error.Error()
 }
 
+func (e *APIException) GetPtr() *APIException {
+	return e
+}
+
 func NewStatusCode(code int64) StatusCode {
 	return StatusCode(code)
 }

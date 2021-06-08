@@ -1,5 +1,7 @@
 package enums
 
+import "strings"
+
 type Role string
 
 const (
@@ -36,6 +38,8 @@ func (role Role) IsAdmin() bool {
 }
 
 func NewRoleFromString(role string) Role {
+
+	role = strings.ToUpper(role)
 
 	validRoles := []Role{USER, ORG_ADMIN, SUPER_ADMIN, ADMIN}
 
