@@ -6,10 +6,6 @@ import (
 	"suxenia-finance/pkg/common/utils"
 )
 
-type AccountValidator func(account *BankingKYC) (*string, bool, error)
-
-type BVNValidator func(account *BankingKYC, bvn string) (*string, bool, error)
-
 func NewBankingKYC(ownerId string, name string) BankingKYC {
 
 	auditData := objects.AuditData{}
