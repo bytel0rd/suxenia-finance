@@ -11,17 +11,17 @@ func TestNewAPIException(t *testing.T) {
 
 	message := "Internal Server Error Exception"
 
-	exception := NewAPIException(errors.New(message), nil)
+	exception := NewAPIException(errors.New(message), 500)
 
 	assert.Equal(t, exception.GetMessage(), message)
 
-	assert.Equal(t, exception.GetStatusCode(), NewStatusCode(500))
+	assert.Equal(t, exception.GetStatusCode(), int(500))
 
 	error := errors.New("UnTested Error Yet")
 
-	errorCode := NewStatusCode(503)
+	errorCode := 503
 
-	exception = NewAPIException(error, &errorCode)
+	exception = NewAPIException(error, errorCode)
 
 	assert.Equal(t, exception.GetMessage(), error.Error())
 
@@ -32,11 +32,17 @@ func TestNewAPIException(t *testing.T) {
 func TestNewAuthorizedException(t *testing.T) {
 	exception := NewUnAuthorizedException(nil)
 
-	assert.Equal(t, exception.GetStatusCode(), NewStatusCode(401))
+	assert.Equal(t, exception.GetStatusCode(), int(401))
+}
+
+func TestNewExceptionFromString(t *testing.T) {
+	exception := NewAPIExceptionFromString("testing", 500)
+
+	assert.Equal(t, exception.GetStatusCode(), int(500))
 }
 
 func TestNewBadRequestException(t *testing.T) {
 	exception := NewBadRequestException(nil)
 
-	assert.Equal(t, exception.GetStatusCode(), NewStatusCode(400))
+	assert.Equal(t, exception.GetStatusCode(), int(400))
 }

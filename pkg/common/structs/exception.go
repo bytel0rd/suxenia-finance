@@ -1,43 +1,42 @@
 package structs
 
-import "errors"
-
-type StatusCode int64
+import (
+	"errors"
+	"net/http"
+)
 
 type APIException struct {
-	statusCode StatusCode
-	error
+	StatusCode int         `json:"statusCode"`
+	Error      interface{} `json:"errors"`
+	Message    string      `json:"errorMessage"`
 }
 
-func (e *APIException) GetStatusCode() StatusCode {
-	return e.statusCode
+func (e *APIException) GetStatusCode() int {
+	return e.StatusCode
 }
 
 func (e *APIException) GetMessage() string {
-	return e.error.Error()
+	return e.Message
 }
 
 func (e *APIException) GetPtr() *APIException {
 	return e
 }
 
-func NewStatusCode(code int64) StatusCode {
-	return StatusCode(code)
-}
-
-func NewAPIException(error error, code *StatusCode) APIException {
-
-	if code == nil {
-		errorCode := NewStatusCode(500)
-		code = &errorCode
-	}
+func NewAPIException(error error, code int) APIException {
 
 	exception := APIException{
-		statusCode: *code,
-		error:      error,
+		StatusCode: code,
+		Error:      error,
+		Message:    error.Error(),
 	}
 
 	return exception
+}
+
+func NewAPIExceptionFromString(message string, code int) APIException {
+
+	return NewAPIException(errors.New(message), code)
 }
 
 func NewUnAuthorizedException(error *error) APIException {
@@ -47,27 +46,17 @@ func NewUnAuthorizedException(error *error) APIException {
 		error = &errorMessage
 	}
 
-	exception := APIException{
-		statusCode: NewStatusCode(401),
-		error:      *error,
-	}
-
-	return exception
+	return NewAPIException(*error, http.StatusUnauthorized)
 
 }
 
 func NewBadRequestException(error *error) APIException {
 
 	if error == nil {
-		errorMessage := errors.New("UnAuthorized Exception")
+		errorMessage := errors.New("Bad Exception")
 		error = &errorMessage
 	}
 
-	exception := APIException{
-		statusCode: NewStatusCode(400),
-		error:      *error,
-	}
-
-	return exception
+	return NewAPIException(*error, http.StatusBadRequest)
 
 }
