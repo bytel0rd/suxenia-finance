@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"suxenia-finance/pkg/common/utils"
 	"suxenia-finance/pkg/kyc/application"
 	"suxenia-finance/pkg/kyc/infrastructure/routes"
 
@@ -35,6 +36,7 @@ func main() {
 
 	routes.RegisterRoutes(r)
 
+	utils.LoggerInstance.Infof("Server listen on port %s", ":5050")
 	r.Run(":5005")
 
 }

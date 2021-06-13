@@ -1,6 +1,8 @@
 package repos
 
 import (
+	"database/sql"
+	"fmt"
 	"log"
 	"suxenia-finance/pkg/kyc/infrastructure/persistence/entities"
 
@@ -9,38 +11,78 @@ import (
 	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
+	"github.com/stretchr/testify/assert"
 )
 
-func Test(t *testing.T) {
-	// this Pings the database trying to connect
-	// use sqlx.Open() for sql.Open() semantics
+var BankKycRepoInstance *BankKycRepo
+
+func init() {
 	db, err := sqlx.Connect("postgres", "user=postgres dbname=suxenia-finance-staging  password=root sslmode=disable")
 	if err != nil {
 		log.Fatalln(err)
 	}
 
-	bank, err := NewBankycRepo(db)
+	// defer func() {
+	// 	db.Close()
+	// }()
 
-	if err != nil {
-		panic(err)
+	BankKycRepoInstance, err = NewBankycRepo(db)
+
+}
+
+func TestCreateBankKyc(t *testing.T) {
+
+	bankRecord := entities.NewBankingKycEntity("CREATE-TEST", uuid.NewString())
+
+	kyc, error := BankKycRepoInstance.Create(bankRecord)
+
+	assert.Nil(t, error)
+	assert.Equal(t, kyc.Id, bankRecord.Id)
+
+}
+
+func TestFindBankById(t *testing.T) {
+
+	id := "9a2cce61-2b62-44cf-ab28-606b96975185"
+
+	// bank.FindById("9a2cce61-2b62-44cf-ab28-606b969751855")
+	bankKyc, error := BankKycRepoInstance.FindById(id)
+
+	assert.Nil(t, error)
+	assert.Equal(t, bankKyc.Id, id)
+
+}
+
+func TestUpdateBankKYC(t *testing.T) {
+
+	kyc, _ := BankKycRepoInstance.FindById("9a2cce61-2b62-44cf-ab28-606b96975185")
+
+	kyc.Name = fmt.Sprintf("Test-%s-Name", uuid.NewString())
+	kyc.BankAccountName = sql.NullString{
+		String: "Oyegoke Abiodun A",
+		Valid:  true,
+	}
+	kyc.BVN = sql.NullString{
+		String: "22222222222",
+		Valid:  true,
 	}
 
-	bankRecord := entities.NewBankingKycEntity("Tayo Adekunle", uuid.NewString())
+	update, error := BankKycRepoInstance.Update(kyc)
 
-	bank.Create(bankRecord)
+	assert.Nil(t, error)
+	assert.Equal(t, update.Id, kyc.Id)
 
-	// bank.FindById("9a2cce61-2b62-44cf-ab28-606b96975185")
-	bank.FindById("f6c6bc77-rabd-41ae-82d6-84b1f24ccf83")
+}
 
-	bankRecord.Name = "Oyegoke Abiodun"
+func TestDeleteBankKyc(t *testing.T) {
 
-	bank.Update(&bankRecord)
+	bankRecord := entities.NewBankingKycEntity("TEST_DELETE_NAME", uuid.NewString())
 
-	bank.Delete(bankRecord.Id)
+	kyc, _ := BankKycRepoInstance.Create(bankRecord)
 
-	// db.Close()
+	ok, error := BankKycRepoInstance.Delete(kyc.Id)
 
-	// fmt.Printf("err: %v \n", er)
-	// fmt.Printf("value: %v \n", v)
+	assert.Nil(t, error)
+	assert.True(t, ok)
 
 }

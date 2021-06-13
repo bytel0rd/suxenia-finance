@@ -1,8 +1,11 @@
 package repos
 
 import (
+	"database/sql"
 	"errors"
 	"fmt"
+	"suxenia-finance/pkg/common/persistence"
+	"suxenia-finance/pkg/common/utils"
 	"suxenia-finance/pkg/kyc/infrastructure/persistence/entities"
 
 	"github.com/jmoiron/sqlx"
@@ -32,14 +35,19 @@ func (b *BankKycRepo) Create(kyc entities.BankingKycEntity) (*entities.BankingKy
 	return &kyc, nil
 }
 
-func (b *BankKycRepo) FindById(id string) (*entities.BankingKycEntity, error) {
+func (b BankKycRepo) FindById(id string) (*entities.BankingKycEntity, error) {
 
 	kyc := entities.BankingKycEntity{}
 
 	err := b.db.Get(&kyc, "SELECT * FROM banking_kyc WHERE id = $1", id)
 
 	if err != nil {
-		fmt.Println(err)
+
+		message := err.Error()
+		utils.LoggerInstance.Warn(
+			message,
+		)
+
 		return nil, nil
 	}
 
@@ -48,29 +56,48 @@ func (b *BankKycRepo) FindById(id string) (*entities.BankingKycEntity, error) {
 
 func (b *BankKycRepo) Update(kyc *entities.BankingKycEntity) (*entities.BankingKycEntity, error) {
 
-	_, err := b.db.NamedExec(
+	result := entities.BankingKycEntity{
+		Id:                "",
+		Name:              "",
+		BankAccountName:   sql.NullString{},
+		BankAccountNumber: sql.NullString{},
+		BVN:               sql.NullString{},
+		BankCode:          sql.NullString{},
+		OwnerId:           "",
+		Verified:          false,
+		AuditInfo:         persistence.AuditInfo{},
+	}
+
+	rows, err := b.db.NamedQuery(
 		`UPDATE banking_kyc SET
-			id = :id 
-			name = :name 
-			bank_account_name = :bank_account_name  
-			bank_account_number = :bank_account_number
-			bvn = :bvn 
-			bank_code = :bank_code 
-			owner_id = :owner_id 
-			verified = :verified 
-			created_by = :created_by 
-			updated_by =  :updated_by 
-			created_at = :created_at
+			name = :name,  
+			bank_account_name = :bank_account_name,
+			bank_account_number = :bank_account_number,
+			bvn = :bvn,
+			bank_code = :bank_code,
+			verified = :verified,
+			updated_by =  :updated_by,
 			updated_at = :updated_at
 		WHERE
 			id = :id
+		RETURNING
+			id, name, bank_account_name, bank_account_number, bvn, bank_code, owner_id, verified, created_by, updated_by, created_at, updated_at
 		`, kyc)
 
 	if err != nil {
 		return nil, err
 	}
 
-	return kyc, nil
+	for rows.Next() {
+		err := rows.StructScan(&result)
+		if err != nil {
+			fmt.Println(err)
+		}
+	}
+
+	utils.LoggerInstance.Info(result)
+
+	return &result, nil
 
 }
 
