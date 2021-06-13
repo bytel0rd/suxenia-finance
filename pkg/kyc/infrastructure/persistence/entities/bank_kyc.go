@@ -1,7 +1,10 @@
 package entities
 
 import (
+	"database/sql"
 	"suxenia-finance/pkg/common/persistence"
+
+	"github.com/google/uuid"
 )
 
 type BankingKycEntity struct {
@@ -9,17 +12,37 @@ type BankingKycEntity struct {
 
 	Name string
 
-	BankAccountName string
+	BankAccountName sql.NullString `db:"bank_account_name"`
 
-	BankAccountNumber string
+	BankAccountNumber sql.NullString `db:"bank_account_number"`
 
-	BankCode string
+	BVN sql.NullString
 
-	BVN string
+	BankCode sql.NullString `db:"bank_code"`
 
-	OwnerId string
+	OwnerId string `db:"owner_id"`
 
-	verified bool
+	Verified bool
 
 	persistence.AuditInfo
+}
+
+func (kyc *BankingKycEntity) Validate() (error, bool) {
+
+	return nil, true
+
+}
+
+func NewBankingKycEntity(owner_name, owner_id string) BankingKycEntity {
+	return BankingKycEntity{
+		Id:                uuid.NewString(),
+		Name:              owner_name,
+		BankAccountName:   sql.NullString{},
+		BankAccountNumber: sql.NullString{},
+		BankCode:          sql.NullString{},
+		BVN:               sql.NullString{},
+		OwnerId:           owner_id,
+		Verified:          false,
+		AuditInfo:         persistence.NewAuditInfo(owner_name),
+	}
 }
