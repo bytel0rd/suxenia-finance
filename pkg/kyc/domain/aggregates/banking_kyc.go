@@ -4,6 +4,8 @@ import (
 	"errors"
 	objects "suxenia-finance/pkg/common/domain/valueobjects"
 	"suxenia-finance/pkg/common/utils"
+
+	"github.com/google/uuid"
 )
 
 func NewBankingKYC(ownerId string, name string) BankingKYC {
@@ -14,7 +16,7 @@ func NewBankingKYC(ownerId string, name string) BankingKYC {
 	auditData.SetUpdatedBy(name)
 
 	return BankingKYC{
-		id:                nil,
+		id:                utils.StrToPr(uuid.New().String()),
 		name:              nil,
 		bankAccountName:   nil,
 		bankAccountNumber: nil,
@@ -46,7 +48,7 @@ type BankingKYC struct {
 	objects.AuditData
 }
 
-func (p *BankingKYC) GetOwnerId() (*string, bool) {
+func (p *BankingKYC) GetId() (*string, bool) {
 
 	if p.id != nil {
 		return p.id, true
@@ -55,10 +57,29 @@ func (p *BankingKYC) GetOwnerId() (*string, bool) {
 	return nil, false
 }
 
+func (p *BankingKYC) SetId(id *string) error {
+
+	if utils.IsValidString(id) {
+		p.id = id
+		return nil
+	}
+
+	return errors.New("invalid id provided for banking kyc")
+}
+
+func (p *BankingKYC) GetOwnerId() (*string, bool) {
+
+	if p.ownerId != nil {
+		return p.ownerId, true
+	}
+
+	return nil, false
+}
+
 func (p *BankingKYC) SetOwnerId(id *string) error {
 
-	if true {
-		p.id = id
+	if utils.IsValidString(id) {
+		p.ownerId = id
 		return nil
 	}
 
