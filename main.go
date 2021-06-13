@@ -1,8 +1,13 @@
 package main
 
 import (
-	"fmt"
-	"suxenia-finance/pkg/kyc/domain/aggregates"
+	"log"
+	"suxenia-finance/pkg/kyc/application"
+	"suxenia-finance/pkg/kyc/infrastructure/routes"
+
+	"github.com/gin-gonic/gin"
+	"github.com/jmoiron/sqlx"
+	_ "github.com/lib/pq"
 )
 
 // This  project is been implemented with domain driven design (DDD)
@@ -15,7 +20,21 @@ import (
 
 func main() {
 
-	bank := aggregates.NewBankingKYC("test-ownerId", "Oyegoke Abiodun")
+	db, err := sqlx.Connect("postgres", "user=postgres dbname=suxenia-finance-staging  password=root sslmode=disable")
+	if err != nil {
+		log.Fatalln(err)
+	}
 
-	fmt.Println(bank.GetName())
+	error := application.InstancateRepos(db)
+
+	if err != nil {
+		log.Fatalln(error)
+	}
+
+	r := gin.Default()
+
+	routes.RegisterRoutes(r)
+
+	r.Run(":5005")
+
 }
