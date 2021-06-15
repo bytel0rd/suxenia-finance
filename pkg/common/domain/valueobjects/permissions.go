@@ -47,13 +47,8 @@ func NewPermission() Permissions {
 	return Permissions{}
 }
 
-func NewPermissionFromStrings(perms *[]string) Permissions {
-
-	if perms == nil {
-		return NewPermission()
-	}
-
+func NewPermissionFromStrings(perms []string) Permissions {
 	return Permissions{
-		perms: *perms,
+		perms: perms,
 	}
 }

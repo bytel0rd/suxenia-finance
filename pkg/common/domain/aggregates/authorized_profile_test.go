@@ -89,9 +89,7 @@ func TestAuthorizeProfilePermissions(t *testing.T) {
 
 	assert.IsType(t, permissions, objects.Permissions{})
 
-	x0 := []string{"READ"}
-
-	readPermission := objects.NewPermissionFromStrings(&x0)
+	readPermission := objects.NewPermissionFromStrings([]string{"READ"})
 
 	err := authorizeProfile.SetPermissions(readPermission)
 

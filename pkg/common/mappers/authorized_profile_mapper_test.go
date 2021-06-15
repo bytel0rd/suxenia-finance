@@ -14,14 +14,7 @@ func TestAuthorizedProfileFromAuthProfileMapper(t *testing.T) {
 
 	role := enums.ORG_ADMIN
 
-	profile := structs.AuthProfile{
-		Email:       new(string),
-		FullName:    new(string),
-		Id:          new(string),
-		Permissions: &[]string{},
-		Role:        &role,
-		OrgId:       new(string),
-	}
+	profile := structs.AuthProfile{}
 
 	authorizedProfile, err := NewAuthorizedProfileFromAuthProfile(profile)
 
@@ -29,12 +22,12 @@ func TestAuthorizedProfileFromAuthProfileMapper(t *testing.T) {
 	assert.IsType(t, *err, structs.APIException{})
 
 	profile = structs.AuthProfile{
-		Email:       utils.StrToPr("tayoadekunle@suxenia.com"),
-		FullName:    utils.StrToPr("Tayo Adekunle"),
-		Id:          utils.StrToPr("suxenia-profile-id"),
-		Permissions: &[]string{},
-		Role:        &role,
-		OrgId:       utils.StrToPr("suxenia-orgoid"),
+		Email:       "tayoadekunle@suxenia.com",
+		FullName:    "Tayo Adekunle",
+		ID:          "suxenia-profile-id",
+		Permissions: []string{},
+		Role:        string(role),
+		OrgID:       utils.StrToPr("suxenia-orgoid"),
 	}
 
 	authorizedProfile, err = NewAuthorizedProfileFromAuthProfile(profile)

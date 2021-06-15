@@ -4,7 +4,6 @@ import (
 	"log"
 	"suxenia-finance/pkg/common/utils"
 	"suxenia-finance/pkg/kyc/application"
-	"suxenia-finance/pkg/kyc/infrastructure/routes"
 
 	"github.com/gin-gonic/gin"
 	"github.com/jmoiron/sqlx"
@@ -34,7 +33,7 @@ func main() {
 
 	r := gin.Default()
 
-	routes.RegisterRoutes(r)
+	mountHttpInfrastructure(r)
 
 	utils.LoggerInstance.Infof("Server listen on port %s", ":5050")
 	r.Run(":5005")

@@ -5,6 +5,7 @@ import (
 	objects "suxenia-finance/pkg/common/domain/valueobjects"
 	"suxenia-finance/pkg/common/enums"
 	"suxenia-finance/pkg/common/structs"
+	"suxenia-finance/pkg/common/utils"
 )
 
 func NewAuthorizedProfileFromAuthProfile(profile structs.AuthProfile) (*aggregates.AuthorizeProfile, *structs.APIException) {
@@ -19,11 +20,17 @@ func NewAuthorizedProfileFromAuthProfile(profile structs.AuthProfile) (*aggregat
 
 	authorizedProfile := aggregates.AuthorizeProfile{}
 
-	authorizedProfile.SetEmail(objects.NewEmail(profile.Email))
-	authorizedProfile.SetFullName(*profile.FullName)
-	authorizedProfile.SetOrgId(*profile.OrgId)
+	authorizedProfile.SetProfileId(profile.ID)
+	authorizedProfile.SetEmail(objects.NewEmail(utils.StrToPr(profile.Email)))
+	authorizedProfile.SetFullName(profile.FullName)
+
+	if profile.OrgID != nil {
+
+		authorizedProfile.SetOrgId(*profile.OrgID)
+	}
+
 	authorizedProfile.SetPermissions(objects.NewPermissionFromStrings(profile.Permissions))
-	authorizedProfile.SetRole(enums.NewRoleFromString(string(*profile.Role)))
+	authorizedProfile.SetRole(enums.NewRoleFromString(profile.Role))
 
 	return &authorizedProfile, nil
 

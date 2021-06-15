@@ -10,7 +10,7 @@ func TestPermissionLength(t *testing.T) {
 
 	inputPerms := []string{"READ", "WRITE"}
 
-	perms := NewPermissionFromStrings(&inputPerms)
+	perms := NewPermissionFromStrings(inputPerms)
 
 	assert.Equal(t, perms.Length(), 2)
 
@@ -20,7 +20,7 @@ func TestPermissionAdd(t *testing.T) {
 
 	inputPerms := []string{"READ", "WRITE"}
 
-	perms := NewPermissionFromStrings(&inputPerms)
+	perms := NewPermissionFromStrings(inputPerms)
 
 	perms.Add("DELETE")
 
@@ -32,7 +32,7 @@ func TestPermissionInclude(t *testing.T) {
 
 	inputPerms := []string{"READ", "WRITE", "DELETE"}
 
-	perms := NewPermissionFromStrings(&inputPerms)
+	perms := NewPermissionFromStrings(inputPerms)
 
 	ok := perms.Include("WRITE")
 
@@ -48,7 +48,7 @@ func TestPermissionRemove(t *testing.T) {
 
 	inputPerms := []string{"READ", "WRITE", "DELETE"}
 
-	perms := NewPermissionFromStrings(&inputPerms)
+	perms := NewPermissionFromStrings(inputPerms)
 
 	perms.Remove("READ")
 
