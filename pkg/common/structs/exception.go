@@ -34,6 +34,17 @@ func NewAPIException(error error, code int) APIException {
 	return exception
 }
 
+func NewRawAPIException(error interface{}, message string, code int) APIException {
+
+	exception := APIException{
+		StatusCode: code,
+		Error:      error,
+		Message:    message,
+	}
+
+	return exception
+}
+
 func NewAPIExceptionFromString(message string, code int) APIException {
 
 	return NewAPIException(errors.New(message), code)

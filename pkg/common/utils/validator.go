@@ -1,7 +1,9 @@
 package utils
 
 import (
-	"fmt"
+	"database/sql"
+	"database/sql/driver"
+	"reflect"
 
 	"github.com/go-playground/locales/en"
 	ut "github.com/go-playground/universal-translator"
@@ -27,9 +29,33 @@ func init() {
 	translator, _ = uni.GetTranslator("en")
 
 	validateInstance = validator.New()
+
+	registerCustomTypes(validateInstance)
 	en_translations.RegisterDefaultTranslations(validateInstance, translator)
 
 	translateOverride(translator)
+}
+
+func registerCustomTypes(validate *validator.Validate) {
+
+	var ValidateValuer = func(field reflect.Value) interface{} {
+
+		if valuer, ok := field.Interface().(driver.Valuer); ok {
+
+			val, err := valuer.Value()
+
+			if err == nil {
+				return val
+			}
+
+			// handle the error how you want
+		}
+
+		return nil
+	}
+
+	validate.RegisterCustomTypeFunc(ValidateValuer, sql.NullString{}, sql.NullInt64{}, sql.NullBool{}, sql.NullFloat64{})
+
 }
 
 func translateOverride(trans ut.Translator) {
@@ -50,17 +76,22 @@ func translateOverride(trans ut.Translator) {
 		return t
 	})
 
-	// validateInstance.RegisterTranslation("len", trans, func(ut ut.Translator) error {
-	// 	return ut.Add("email", "{0} must be a valid email address!", true)
-	// }, func(ut ut.Translator, fe validator.FieldError) string {
-	// 	t, _ := ut.T("email", fe.Field())
+	validateInstance.RegisterTranslation("len", trans, func(ut ut.Translator) error {
+		return ut.Add("len", "{0} is not valid!", true)
+	}, func(ut ut.Translator, fe validator.FieldError) string {
+		t, _ := ut.T("len", fe.Field())
 
-	// 	return t
-	// })
+		return t
+	})
 
 }
 
-func Validate(value interface{}) (bool, *validator.ValidationErrors) {
+type ValidatedFieldError struct {
+	Field   string `json:"field"`
+	Message string `json:"message"`
+}
+
+func Validate(value interface{}) (bool, *[]ValidatedFieldError) {
 
 	err := validateInstance.Struct(value)
 
@@ -68,9 +99,23 @@ func Validate(value interface{}) (bool, *validator.ValidationErrors) {
 
 		errs := err.(validator.ValidationErrors)
 
-		fmt.Println(errs.Translate(translator))
+		translated := errs.Translate(translator)
 
-		return false, &errs
+		validationErrors := []ValidatedFieldError{}
+
+		for _, v := range errs {
+
+			translatedMessage := ValidatedFieldError{
+				Field:   v.Field(),
+				Message: translated[v.Namespace()],
+			}
+
+			validationErrors = append(validationErrors, translatedMessage)
+		}
+
+		LoggerInstance.Error(translated)
+
+		return false, &validationErrors
 	}
 
 	return true, nil

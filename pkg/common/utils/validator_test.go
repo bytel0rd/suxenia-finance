@@ -1,6 +1,7 @@
 package utils
 
 import (
+	"database/sql"
 	"testing"
 
 	"github.com/go-playground/validator/v10"
@@ -44,6 +45,39 @@ func TestValidatorValidInput(t *testing.T) {
 	}
 
 	status, error := Validate(address)
+
+	assert.True(t, status)
+	assert.Nil(t, error)
+
+}
+
+type Person struct {
+	Name    sql.NullString `validate:"required"`
+	PhoneNo sql.NullString `validate:"required,len=11"`
+}
+
+func TestValidatorSqlInValidInput(t *testing.T) {
+
+	person := Person{
+		Name:    sql.NullString{},
+		PhoneNo: sql.NullString{},
+	}
+
+	status, error := Validate(person)
+
+	assert.False(t, status)
+	assert.IsType(t, error, &validator.ValidationErrors{})
+
+}
+
+func TestValidatorSqlValidInput(t *testing.T) {
+
+	person := Person{
+		Name:    sql.NullString{Valid: true, String: "Tayo Adekunle"},
+		PhoneNo: sql.NullString{Valid: true, String: "08149464299"},
+	}
+
+	status, error := Validate(person)
 
 	assert.True(t, status)
 	assert.Nil(t, error)
