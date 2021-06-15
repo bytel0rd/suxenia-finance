@@ -1,4 +1,4 @@
-package repos
+package drivers
 
 import (
 	"errors"
@@ -10,21 +10,21 @@ import (
 	"github.com/jmoiron/sqlx"
 )
 
-func NewVirtualAccountRepo(db *sqlx.DB) (*VirtualAccountRepo, error) {
+func NewVirtualAccountDriver(db *sqlx.DB) (*VirtualAccountDriver, error) {
 
 	if db == nil {
 		return nil, errors.New("cannot create virtual account repo due to invalid connection provided")
 	}
 
-	return &VirtualAccountRepo{db}, nil
+	return &VirtualAccountDriver{db}, nil
 
 }
 
-type VirtualAccountRepo struct {
+type VirtualAccountDriver struct {
 	db *sqlx.DB
 }
 
-func (b *VirtualAccountRepo) Create(kyc entities.VirtualAccountEntity) (*entities.VirtualAccountEntity, error) {
+func (b *VirtualAccountDriver) Create(kyc entities.VirtualAccountEntity) (*entities.VirtualAccountEntity, error) {
 
 	_, err := b.db.NamedExec(
 
@@ -42,7 +42,7 @@ func (b *VirtualAccountRepo) Create(kyc entities.VirtualAccountEntity) (*entitie
 	return &kyc, nil
 }
 
-func (b VirtualAccountRepo) FindById(id string) (*entities.VirtualAccountEntity, error) {
+func (b VirtualAccountDriver) FindById(id string) (*entities.VirtualAccountEntity, error) {
 
 	kyc := entities.VirtualAccountEntity{}
 
@@ -61,7 +61,7 @@ func (b VirtualAccountRepo) FindById(id string) (*entities.VirtualAccountEntity,
 	return &kyc, nil
 }
 
-func (b *VirtualAccountRepo) Update(kyc *entities.VirtualAccountEntity) (*entities.VirtualAccountEntity, error) {
+func (b *VirtualAccountDriver) Update(kyc *entities.VirtualAccountEntity) (*entities.VirtualAccountEntity, error) {
 
 	result := entities.VirtualAccountEntity{
 		Id:            "",
@@ -106,7 +106,7 @@ func (b *VirtualAccountRepo) Update(kyc *entities.VirtualAccountEntity) (*entiti
 
 }
 
-func (b *VirtualAccountRepo) Delete(id string) (bool, error) {
+func (b *VirtualAccountDriver) Delete(id string) (bool, error) {
 
 	_, err := b.db.Exec("delete from virtual_accounts where id = $1", id)
 

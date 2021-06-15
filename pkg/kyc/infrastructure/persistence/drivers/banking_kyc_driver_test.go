@@ -1,4 +1,4 @@
-package repos
+package drivers
 
 import (
 	"database/sql"
@@ -14,7 +14,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-var BankKycRepoInstance *BankKycRepo
+var BankKycDriverInstance *BankKycDriver
 
 func init() {
 	db, err := sqlx.Connect("postgres", "user=postgres dbname=suxenia-finance-staging  password=root sslmode=disable")
@@ -26,7 +26,7 @@ func init() {
 	// 	db.Close()
 	// }()
 
-	BankKycRepoInstance, err = NewBankycRepo(db)
+	BankKycDriverInstance, err = NewBankycDriver(db)
 
 }
 
@@ -34,7 +34,7 @@ func TestCreateBankKyc(t *testing.T) {
 
 	bankRecord := entities.NewBankingKycEntity("CREATE-TEST", uuid.NewString())
 
-	kyc, error := BankKycRepoInstance.Create(bankRecord)
+	kyc, error := BankKycDriverInstance.Create(bankRecord)
 
 	assert.Nil(t, error)
 	assert.Equal(t, kyc.Id, bankRecord.Id)
@@ -46,7 +46,7 @@ func TestFindBankById(t *testing.T) {
 	id := "9a2cce61-2b62-44cf-ab28-606b96975185"
 
 	// bank.FindById("9a2cce61-2b62-44cf-ab28-606b969751855")
-	bankKyc, error := BankKycRepoInstance.FindById(id)
+	bankKyc, error := BankKycDriverInstance.FindById(id)
 
 	assert.Nil(t, error)
 	assert.Equal(t, bankKyc.Id, id)
@@ -55,7 +55,7 @@ func TestFindBankById(t *testing.T) {
 
 func TestUpdateBankKYC(t *testing.T) {
 
-	kyc, _ := BankKycRepoInstance.FindById("9a2cce61-2b62-44cf-ab28-606b96975185")
+	kyc, _ := BankKycDriverInstance.FindById("9a2cce61-2b62-44cf-ab28-606b96975185")
 
 	kyc.Name = fmt.Sprintf("Test-%s-Name", uuid.NewString())
 	kyc.BankAccountName = sql.NullString{
@@ -67,7 +67,7 @@ func TestUpdateBankKYC(t *testing.T) {
 		Valid:  true,
 	}
 
-	update, error := BankKycRepoInstance.Update(kyc)
+	update, error := BankKycDriverInstance.Update(*kyc)
 
 	assert.Nil(t, error)
 	assert.Equal(t, update.Id, kyc.Id)
@@ -78,9 +78,9 @@ func TestDeleteBankKyc(t *testing.T) {
 
 	bankRecord := entities.NewBankingKycEntity("TEST_DELETE_NAME", uuid.NewString())
 
-	kyc, _ := BankKycRepoInstance.Create(bankRecord)
+	kyc, _ := BankKycDriverInstance.Create(bankRecord)
 
-	ok, error := BankKycRepoInstance.Delete(kyc.Id)
+	ok, error := BankKycDriverInstance.Delete(kyc.Id)
 
 	assert.Nil(t, error)
 	assert.True(t, ok)
