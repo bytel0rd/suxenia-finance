@@ -8,4 +8,6 @@ func RegisterRoutes(router *gin.Engine) {
 
 	bankKycRouter.GET("/:id", GetBankingKycById)
 
+	bankKycRouter.POST("/", CreateBankingKyc)
+
 }

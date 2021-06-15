@@ -23,29 +23,33 @@ type BankingKycViewModel struct {
 }
 
 type CreateBankKycDTO struct {
-	Name string `json:"name"`
+	Name string `json:"name" validate:"required"`
 
-	BankAccountName *string `json:"bankAccountName"`
+	BankAccountName *string `json:"bankAccountName" validate:"omitempty"`
 
-	BankAccountNumber *string `json:"bankAccountNumber"`
+	BankAccountNumber *string `json:"bankAccountNumber" validate:"omitempty,len=10"`
 
-	BVN *string `json:"bvn"`
+	BVN *string `json:"bvn" validate:"omitempty,len=11"`
 
-	BankCode *string `json:"bankCode"`
+	BankCode *string `json:"bankCode" validate:"omitempty"`
 
-	OwnerId *string `json:"ownerId"`
+	OwnerId *string `json:"ownerId" validate:"required"`
 }
 
 type UpdateBankKycDTO struct {
-	Id string `json:"id"`
+	Id string `json:"id" validate:"required"`
 
-	Name string `json:"name"`
+	Name *string `json:"name" validate:"omitempty"`
 
-	BankAccountName *string `json:"bankAccountName"`
+	BankAccountName *string `json:"bankAccountName" validate:"omitempty"`
 
-	BankAccountNumber *string `json:"bankAccountNumber"`
+	BankAccountNumber *string `json:"bankAccountNumber" validate:"omitempty,len=10"`
 
-	BVN *string `json:"bvn"`
+	BVN *string `json:"bvn" validate:"omitempty,len=11"`
 
-	BankCode *string `json:"bankCode"`
+	BankCode *string `json:"bankCode" validate:"omitempty"`
+}
+
+type DeleteBankKycDTO struct {
+	Id string `json:"id" validate:"required"`
 }
