@@ -1,6 +1,8 @@
 package utils
 
-import "strings"
+import (
+	"strings"
+)
 
 func IsValidString(s string) bool {
 	return len(strings.TrimSpace(s)) > 0

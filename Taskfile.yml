@@ -1,0 +1,24 @@
+# https://taskfile.dev
+
+version: '3'
+
+vars:
+  GREETING: Hello, World!
+
+tasks:
+  default:
+    cmds:
+      - task -l
+    silent: true
+  
+  start:
+    desc: "Starts the project server in debug mode."
+    cmds:
+      - go run ./
+  
+  test:
+    desc: "Runs the project tests including subpackages."
+    cmds:
+      - go test ./... -coverprofile cover.out
+      - go tool cover -html cover.out
+

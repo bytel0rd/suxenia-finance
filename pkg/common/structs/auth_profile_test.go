@@ -14,4 +14,7 @@ func TestAuthProfileIsValid(t *testing.T) {
 
 	assert.False(t, ok)
 
+	error := authProfile.Validate()
+	assert.Error(t, error)
+
 }

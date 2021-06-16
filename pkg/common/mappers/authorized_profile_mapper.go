@@ -12,7 +12,7 @@ func NewAuthorizedProfileFromAuthProfile(profile structs.AuthProfile) (*aggregat
 
 	if err := profile.Validate(); err != nil {
 
-		apiError := structs.NewUnAuthorizedException(&err)
+		apiError := structs.NewUnAuthorizedException(err)
 
 		return nil, &apiError
 

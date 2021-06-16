@@ -1,6 +1,7 @@
 package repos
 
 import (
+	"suxenia-finance/pkg/common/structs"
 	kycAggregates "suxenia-finance/pkg/kyc/domain/aggregates"
 	"suxenia-finance/pkg/kyc/infrastructure/persistence/drivers"
 	"suxenia-finance/pkg/kyc/mappers"
@@ -24,7 +25,7 @@ type BankingKycRepo struct {
 	driver *drivers.BankKycDriver
 }
 
-func (r *BankingKycRepo) RetrieveById(id string) (*kycAggregates.BankingKYC, bool, error) {
+func (r *BankingKycRepo) RetrieveById(id string) (*kycAggregates.BankingKYC, bool, *structs.DBException) {
 
 	kycEntity, error := r.driver.FindById(id)
 
@@ -42,7 +43,7 @@ func (r *BankingKycRepo) RetrieveById(id string) (*kycAggregates.BankingKYC, boo
 
 }
 
-func (r *BankingKycRepo) Create(bankingKyc kycAggregates.BankingKYC) (*kycAggregates.BankingKYC, error) {
+func (r *BankingKycRepo) Create(bankingKyc kycAggregates.BankingKYC) (*kycAggregates.BankingKYC, *structs.DBException) {
 
 	bankingKycEntity := mappers.BankingKycAggregateToPersistence(bankingKyc)
 
@@ -57,7 +58,7 @@ func (r *BankingKycRepo) Create(bankingKyc kycAggregates.BankingKYC) (*kycAggreg
 	return &bankingKyc, nil
 }
 
-func (r *BankingKycRepo) Update(bankingKyc kycAggregates.BankingKYC) (*kycAggregates.BankingKYC, error) {
+func (r *BankingKycRepo) Update(bankingKyc kycAggregates.BankingKYC) (*kycAggregates.BankingKYC, *structs.DBException) {
 
 	bankingKycEntity := mappers.BankingKycAggregateToPersistence(bankingKyc)
 
@@ -73,7 +74,7 @@ func (r *BankingKycRepo) Update(bankingKyc kycAggregates.BankingKYC) (*kycAggreg
 	return &bankingKyc, nil
 }
 
-func (r *BankingKycRepo) Delete(id string) (bool, error) {
+func (r *BankingKycRepo) Delete(id string) (bool, *structs.DBException) {
 
 	_, error := r.driver.FindById(id)
 

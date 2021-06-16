@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"testing"
 
-	"github.com/go-playground/validator/v10"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -30,8 +29,10 @@ func TestValidatorInvalidInput(t *testing.T) {
 
 	status, error := Validate(user)
 
+	typeValue := []ValidatedFieldError{}
+
 	assert.False(t, status)
-	assert.IsType(t, error, &validator.ValidationErrors{})
+	assert.IsType(t, error, &typeValue)
 
 }
 
@@ -65,8 +66,10 @@ func TestValidatorSqlInValidInput(t *testing.T) {
 
 	status, error := Validate(person)
 
+	typeValue := []ValidatedFieldError{}
+
 	assert.False(t, status)
-	assert.IsType(t, error, &validator.ValidationErrors{})
+	assert.IsType(t, error, &typeValue)
 
 }
 

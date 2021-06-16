@@ -50,24 +50,35 @@ func NewAPIExceptionFromString(message string, code int) APIException {
 	return NewAPIException(errors.New(message), code)
 }
 
-func NewUnAuthorizedException(error *error) APIException {
+func NewUnAuthorizedException(error error) APIException {
 
 	if error == nil {
 		errorMessage := errors.New("UnAuthorized Exception")
-		error = &errorMessage
+		error = errorMessage
 	}
 
-	return NewAPIException(*error, http.StatusUnauthorized)
+	return NewAPIException(error, http.StatusUnauthorized)
 
 }
 
-func NewBadRequestException(error *error) APIException {
+func NewBadRequestException(error error) APIException {
 
 	if error == nil {
 		errorMessage := errors.New("Bad Exception")
-		error = &errorMessage
+		error = errorMessage
 	}
 
-	return NewAPIException(*error, http.StatusBadRequest)
+	return NewAPIException(error, http.StatusBadRequest)
+
+}
+
+func NewInternalServerException(error error) APIException {
+
+	if error == nil {
+		errorMessage := errors.New("internal server error")
+		error = errorMessage
+	}
+
+	return NewAPIException(error, http.StatusInternalServerError)
 
 }

@@ -27,7 +27,7 @@ func (p Permissions) Include(permission string) bool {
 	return includes
 }
 
-func (p Permissions) Remove(permission string) {
+func (p *Permissions) Remove(permission string) {
 
 	filter := []string{}
 

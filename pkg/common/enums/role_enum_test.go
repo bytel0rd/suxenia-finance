@@ -1,6 +1,7 @@
 package enums
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -18,6 +19,9 @@ func TestRoleIsSuperAdmin(t *testing.T) {
 }
 
 func TestRoleIsOrgAdmin(t *testing.T) {
+	v := ORG_ADMIN.IsOrgAdmin()
+	fmt.Println(v)
+
 	assert.True(t, SUPER_ADMIN.IsOrgAdmin())
 	assert.True(t, ORG_ADMIN.IsOrgAdmin())
 }

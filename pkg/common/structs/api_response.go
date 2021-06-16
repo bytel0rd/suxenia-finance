@@ -1,11 +1,11 @@
 package structs
 
 type APIResponse struct {
-	StatusCode int64       `json:"statuscode"`
+	StatusCode int         `json:"statuscode"`
 	Data       interface{} `json:"data"`
 }
 
-func (e *APIResponse) GetStatusCode() int64 {
+func (e *APIResponse) GetStatusCode() int {
 	return e.StatusCode
 }
 
@@ -17,7 +17,7 @@ func (e *APIResponse) GetPtr() *APIResponse {
 	return e
 }
 
-func NewAPIResponse(data interface{}, code int64) APIResponse {
+func NewAPIResponse(data interface{}, code int) APIResponse {
 
 	response := APIResponse{
 		StatusCode: code,

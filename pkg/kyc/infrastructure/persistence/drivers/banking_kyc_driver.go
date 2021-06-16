@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"suxenia-finance/pkg/common/persistence"
+	"suxenia-finance/pkg/common/structs"
 	"suxenia-finance/pkg/common/utils"
 	"suxenia-finance/pkg/kyc/infrastructure/persistence/entities"
 
@@ -16,10 +17,13 @@ type BankKycDriver struct {
 	db *sqlx.DB
 }
 
-func (b *BankKycDriver) Create(kyc entities.BankingKycEntity) (*entities.BankingKycEntity, error) {
+func (b *BankKycDriver) Create(kyc entities.BankingKycEntity) (*entities.BankingKycEntity, *structs.DBException) {
 
 	if valid, error := kyc.Validate(); !valid {
-		return nil, error
+
+		exception := structs.NewDBException(error, true)
+
+		return nil, &exception
 	}
 
 	_, err := b.db.NamedExec(
@@ -36,18 +40,18 @@ func (b *BankKycDriver) Create(kyc entities.BankingKycEntity) (*entities.Banking
 	}
 
 	if err != nil {
-		utils.LoggerInstance.Error(err)
 
-		a := err.(*pq.Error)
+		pgError := err.(*pq.Error)
+		utils.LoggerInstance.Error(pgError)
 
-		utils.LoggerInstance.Error(a)
-		return nil, err
+		exception := structs.NewDBException(pgError, false)
+		return nil, &exception
 	}
 
 	return &kyc, nil
 }
 
-func (b BankKycDriver) FindById(id string) (*entities.BankingKycEntity, error) {
+func (b BankKycDriver) FindById(id string) (*entities.BankingKycEntity, *structs.DBException) {
 
 	kyc := entities.BankingKycEntity{}
 
@@ -67,10 +71,11 @@ func (b BankKycDriver) FindById(id string) (*entities.BankingKycEntity, error) {
 	return &kyc, nil
 }
 
-func (b *BankKycDriver) Update(kyc entities.BankingKycEntity) (*entities.BankingKycEntity, error) {
+func (b *BankKycDriver) Update(kyc entities.BankingKycEntity) (*entities.BankingKycEntity, *structs.DBException) {
 
 	if valid, error := kyc.Validate(); !valid {
-		return nil, error
+		exception := structs.NewDBException(error, true)
+		return nil, &exception
 	}
 
 	result := entities.BankingKycEntity{
@@ -102,7 +107,9 @@ func (b *BankKycDriver) Update(kyc entities.BankingKycEntity) (*entities.Banking
 		`, kyc)
 
 	if err != nil {
-		return nil, err
+		exception := structs.NewDBException(err, true)
+
+		return nil, &exception
 	}
 
 	for rows.Next() {
@@ -118,12 +125,15 @@ func (b *BankKycDriver) Update(kyc entities.BankingKycEntity) (*entities.Banking
 
 }
 
-func (b *BankKycDriver) Delete(id string) (bool, error) {
+func (b *BankKycDriver) Delete(id string) (bool, *structs.DBException) {
 
 	_, err := b.db.Exec("delete from banking_kyc where id = $1", id)
 
 	if err != nil {
-		return false, err
+		utils.LoggerInstance.Error(err)
+
+		exception := structs.NewDBException(err, true)
+		return false, &exception
 	}
 
 	return true, nil

@@ -48,7 +48,7 @@ func TestAuthorizeProfileFullName(t *testing.T) {
 
 	assert.True(t, ok)
 
-	assert.Equal(t, fullName, name)
+	assert.Equal(t, *fullName, name)
 
 }
 
@@ -76,7 +76,7 @@ func TestAuthorizeProfileId(t *testing.T) {
 
 	profileId, ok = authorizeProfile.GetProfileId()
 
-	assert.Equal(t, profileId, id)
+	assert.Equal(t, *profileId, id)
 	assert.True(t, ok)
 
 }
@@ -123,7 +123,7 @@ func TestAuthorizeOrgId(t *testing.T) {
 
 	orgId, ok = authorizeProfile.GetOrgId()
 
-	assert.Equal(t, orgId, id)
+	assert.Equal(t, *orgId, id)
 
 	assert.True(t, ok)
 
