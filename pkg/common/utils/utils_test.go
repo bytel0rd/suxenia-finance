@@ -10,11 +10,12 @@ func TestIsValidString(t *testing.T) {
 	emptyString := ""
 	validString := "Random string"
 
-	assert.False(t, IsValidString(nil))
+	assert.False(t, IsValidString(""))
+	assert.True(t, IsValidString("Tayo Adekunle"))
 
-	assert.False(t, IsValidString(&emptyString))
-	assert.False(t, IsValidString(new(string)))
+	assert.False(t, IsValidStringPointer(&emptyString))
+	assert.False(t, IsValidStringPointer(new(string)))
 
-	assert.True(t, IsValidString(&validString))
+	assert.True(t, IsValidStringPointer(&validString))
 
 }

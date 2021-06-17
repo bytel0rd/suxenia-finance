@@ -14,14 +14,12 @@ func TestBankingKYCOwnerId(t *testing.T) {
 
 	bank := NewBankingKYC("ownerId", testName)
 
-	ownerId, ownerOk := bank.GetOwnerId()
+	ownerId, error := bank.GetOwnerId()
 
-	assert.True(t, ownerOk)
+	assert.Nil(t, error)
 	assert.Equal(t, *ownerId, "ownerId")
 
-	err := bank.SetOwnerId(utils.StrToPr(""))
-
-	assert.Error(t, err)
+	bank.SetOwnerId(utils.StrToPr("A"))
 
 }
 func TestBankingKYCName(t *testing.T) {
@@ -30,13 +28,9 @@ func TestBankingKYCName(t *testing.T) {
 
 	bank := NewBankingKYC("ownerId", testName)
 
-	name, nameOk := bank.GetName()
-	assert.True(t, nameOk)
-	assert.Equal(t, name, testName)
-
-	err := bank.SetName(utils.StrToPr(""))
-
-	assert.Error(t, err)
+	name, error := bank.GetName()
+	assert.Nil(t, error)
+	assert.IsType(t, name, new(string))
 
 }
 
@@ -46,21 +40,15 @@ func TestBankingKYCBankAccountName(t *testing.T) {
 
 	bank := NewBankingKYC("ownerId", testName)
 
-	acctName, ok := bank.GetBankAccountName()
-	assert.False(t, ok)
-	assert.Equal(t, acctName, nil)
+	acctName, error := bank.GetBankAccountName()
+	assert.Error(t, error)
+	assert.Nil(t, acctName)
 
-	err := bank.SetBankAccountName(utils.StrToPr(""))
+	bank.SetBankAccountName(&testName)
+	acctName, error = bank.GetBankAccountName()
 
-	assert.Error(t, err)
-
-	err = bank.SetBankAccountName(&testName)
-
-	assert.Nil(t, err)
-
-	acctName, ok = bank.GetBankAccountName()
-	assert.True(t, ok)
-	assert.Equal(t, acctName, testName)
+	assert.Nil(t, error)
+	assert.IsType(t, acctName, new(string))
 }
 
 func TestBankingKYCBankAccountNumber(t *testing.T) {
@@ -69,21 +57,14 @@ func TestBankingKYCBankAccountNumber(t *testing.T) {
 
 	bank := NewBankingKYC("ownerId", testName)
 
-	accountNo, ok := bank.GetBankAccountNumber()
-	assert.False(t, ok)
-	assert.Equal(t, accountNo, nil)
+	_, error := bank.GetBankAccountNumber()
+	assert.Error(t, error)
 
-	err := bank.SetBankAccountNumber(utils.StrToPr(""))
+	bank.SetBankAccountNumber(utils.StrToPr("0125397373"))
+	accountNo, error := bank.GetBankAccountNumber()
 
-	assert.Error(t, err)
-
-	err = bank.SetBankAccountNumber(utils.StrToPr("0125397736"))
-
-	assert.Nil(t, err)
-
-	accountNo, ok = bank.GetBankAccountNumber()
-	assert.True(t, ok)
-	assert.Equal(t, accountNo, testName)
+	assert.Nil(t, error)
+	assert.IsType(t, accountNo, new(string))
 }
 
 func TestBankingKYCBankCode(t *testing.T) {
@@ -92,21 +73,14 @@ func TestBankingKYCBankCode(t *testing.T) {
 
 	bank := NewBankingKYC("ownerId", testName)
 
-	code, ok := bank.GetBankCode()
-	assert.False(t, ok)
-	assert.Equal(t, code, nil)
+	_, error := bank.GetBankCode()
+	assert.Error(t, error)
 
-	err := bank.SetBankCode(utils.StrToPr(""))
+	bank.SetBankCode(utils.StrToPr("GTB"))
+	code, error := bank.GetBankCode()
 
-	assert.Error(t, err)
-
-	err = bank.SetBankCode(utils.StrToPr("GTB"))
-
-	assert.Nil(t, err)
-
-	code, ok = bank.GetBankCode()
-	assert.True(t, ok)
-	assert.Equal(t, code, "GTB")
+	assert.Nil(t, error)
+	assert.IsType(t, code, new(string))
 
 }
 
@@ -116,21 +90,14 @@ func TestBankingKYCBVN(t *testing.T) {
 
 	bank := NewBankingKYC("ownerId", testName)
 
-	bvn, ok := bank.GetBVN()
-	assert.False(t, ok)
-	assert.Equal(t, bvn, nil)
+	_, error := bank.GetBVN()
+	assert.Error(t, error)
 
-	err := bank.SetBVN(utils.StrToPr(""))
+	bank.SetBVN(utils.StrToPr("22222222222"))
+	bvn, error := bank.GetBVN()
 
-	assert.Error(t, err)
-
-	err = bank.SetBVN(utils.StrToPr("22222222222"))
-
-	assert.Nil(t, err)
-
-	bvn, ok = bank.GetBankCode()
-	assert.True(t, ok)
-	assert.Equal(t, bvn, "22222222222")
+	assert.Nil(t, error)
+	assert.IsType(t, bvn, new(string))
 
 }
 
@@ -142,6 +109,14 @@ func TestBankingKYCIsVerified(t *testing.T) {
 
 	ok := bank.IsVerified()
 	assert.False(t, ok)
+
+	bank.SetBankCode(utils.StrToPr("GTB"))
+
+	bank.SetBankAccountNumber(utils.StrToPr(testName))
+
+	bank.SetBVN(utils.StrToPr("11111111111"))
+
+	bank.SetBankAccountNumber(utils.StrToPr("0125397733"))
 
 	err := bank.SetVerificationStatus(true)
 
@@ -187,11 +162,11 @@ func TestBankingKYCAccountValidation(t *testing.T) {
 
 	bank := NewBankingKYC("ownerId", testName)
 
-	_ = bank.SetBankCode(utils.StrToPr("GTB"))
+	bank.SetBankCode(utils.StrToPr("GTB"))
 
-	_ = bank.SetBVN(utils.StrToPr("11111111111"))
+	bank.SetBVN(utils.StrToPr("11111111111"))
 
-	_ = bank.SetBankAccountNumber(utils.StrToPr("08149464288"))
+	bank.SetBankAccountNumber(utils.StrToPr("0125397733"))
 
 	var failVerification AccountValidator = func(account *BankingKYC) (*string, bool, error) {
 		return nil, false, errors.New("Error during account validation")

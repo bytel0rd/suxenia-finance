@@ -48,7 +48,7 @@ func TestAuthorizeProfileFullName(t *testing.T) {
 
 	assert.True(t, ok)
 
-	assert.Equal(t, fullName, name)
+	assert.Equal(t, *fullName, name)
 
 }
 
@@ -76,7 +76,7 @@ func TestAuthorizeProfileId(t *testing.T) {
 
 	profileId, ok = authorizeProfile.GetProfileId()
 
-	assert.Equal(t, profileId, id)
+	assert.Equal(t, *profileId, id)
 	assert.True(t, ok)
 
 }
@@ -89,9 +89,7 @@ func TestAuthorizeProfilePermissions(t *testing.T) {
 
 	assert.IsType(t, permissions, objects.Permissions{})
 
-	x0 := []string{"READ"}
-
-	readPermission := objects.NewPermissionFromStrings(&x0)
+	readPermission := objects.NewPermissionFromStrings([]string{"READ"})
 
 	err := authorizeProfile.SetPermissions(readPermission)
 
@@ -125,7 +123,7 @@ func TestAuthorizeOrgId(t *testing.T) {
 
 	orgId, ok = authorizeProfile.GetOrgId()
 
-	assert.Equal(t, orgId, id)
+	assert.Equal(t, *orgId, id)
 
 	assert.True(t, ok)
 

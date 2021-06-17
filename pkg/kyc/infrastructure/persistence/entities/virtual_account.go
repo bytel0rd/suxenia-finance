@@ -7,19 +7,19 @@ import (
 )
 
 type VirtualAccountEntity struct {
-	Id string
+	Id string `db:"id"`
 
-	AccountName string
+	AccountName string `db:"account_name"`
 
-	AccountNumber string
+	AccountNumber string `db:"account_number"`
 
-	BankName string
+	BankName string `db:"bank_name"`
 
-	Provider string
+	Provider string `db:"provider"`
 
-	Reference string
+	Reference string `db:"reference"`
 
-	OwnerId string
+	OwnerId string `db:"owner_id"`
 
 	persistence.AuditInfo
 }

@@ -2,63 +2,35 @@ package mappers
 
 import (
 	"database/sql"
+	"suxenia-finance/pkg/common/utils"
 	"suxenia-finance/pkg/kyc/domain/aggregates"
 	"suxenia-finance/pkg/kyc/dtos"
 	"suxenia-finance/pkg/kyc/infrastructure/persistence/entities"
 )
 
-func BankingKycAggregateFromPersistence(kycEntity entities.BankingKycEntity) (*aggregates.BankingKYC, error) {
-
-	var error error = nil
+func BankingKycAggregateFromPersistence(kycEntity entities.BankingKycEntity) aggregates.BankingKYC {
 
 	kycAggregate := aggregates.BankingKYC{}
 
-	if error = kycAggregate.SetId(&kycEntity.Id); error != nil {
-		return nil, error
-	}
-
-	if error = kycAggregate.SetName(&kycEntity.Name); error != nil {
-		return nil, error
-	}
+	kycAggregate.SetId(&kycEntity.Id)
+	kycAggregate.SetName(&kycEntity.Name)
+	kycAggregate.SetOwnerId(&kycEntity.OwnerId)
+	kycAggregate.SetVerificationStatus(kycEntity.Verified)
 
 	if kycEntity.BankAccountName.Valid {
-
-		if error = kycAggregate.SetBankAccountName(&kycEntity.BankAccountName.String); error != nil {
-			return nil, error
-		}
-
+		kycAggregate.SetBankAccountName(&kycEntity.BankAccountName.String)
 	}
 
 	if kycEntity.BankAccountNumber.Valid {
-
-		if error = kycAggregate.SetBankAccountNumber(&kycEntity.BankAccountNumber.String); error != nil {
-			return nil, error
-		}
-
+		kycAggregate.SetBankAccountNumber(&kycEntity.BankAccountNumber.String)
 	}
 
 	if kycEntity.BVN.Valid {
-
-		if error = kycAggregate.SetBVN(&kycEntity.BVN.String); error != nil {
-			return nil, error
-		}
-
+		kycAggregate.SetBVN(&kycEntity.BVN.String)
 	}
 
 	if kycEntity.BankCode.Valid {
-
-		if error = kycAggregate.SetBankCode(&kycEntity.BankCode.String); error != nil {
-			return nil, error
-		}
-
-	}
-
-	if error = kycAggregate.SetOwnerId(&kycEntity.OwnerId); error != nil {
-		return nil, error
-	}
-
-	if error = kycAggregate.SetVerificationStatus(kycEntity.Verified); error != nil {
-		return nil, error
+		kycAggregate.SetBankCode(&kycEntity.BankCode.String)
 	}
 
 	kycAggregate.AuditData.SetCreatedAt(kycEntity.CreatedAt)
@@ -66,39 +38,56 @@ func BankingKycAggregateFromPersistence(kycEntity entities.BankingKycEntity) (*a
 	kycAggregate.AuditData.SetUpdatedBy(kycEntity.CreatedBy)
 	kycAggregate.AuditData.SetUpdatedBy(kycEntity.UpdatedBy)
 
-	return &kycAggregate, nil
+	return kycAggregate
 
 }
 
-func BankingKycAggregateToPersistence(kycAggregate aggregates.BankingKYC) (*entities.BankingKycEntity, error) {
+func BankingKycAggregateToPersistence(kycAggregate aggregates.BankingKYC) entities.BankingKycEntity {
 
 	kycEntity := entities.BankingKycEntity{}
 
-	if id, ok := kycAggregate.GetId(); ok {
+	id, _ := kycAggregate.GetId()
+
+	if id != nil {
 		kycEntity.Id = *id
 	}
 
-	if name, ok := kycAggregate.GetName(); ok {
+	name, _ := kycAggregate.GetName()
+
+	if name != nil {
 		kycEntity.Name = *name
 	}
 
-	if acctName, ok := kycAggregate.GetBankAccountName(); ok {
-		kycEntity.BankAccountName = sql.NullString{String: *acctName, Valid: ok}
+	acctName, _ := kycAggregate.GetBankAccountName()
+
+	if acctName != nil {
+		kycEntity.BankAccountName = sql.NullString{String: *acctName, Valid: utils.IsValidStringPointer(acctName)}
 	}
 
-	if acctNo, ok := kycAggregate.GetBankAccountNumber(); ok {
-		kycEntity.BankAccountNumber = sql.NullString{String: *acctNo, Valid: ok}
+	acctNo, _ := kycAggregate.GetBankAccountNumber()
+
+	if acctNo != nil {
+		kycEntity.BankAccountNumber = sql.NullString{String: *acctNo, Valid: utils.IsValidStringPointer(acctNo)}
 	}
 
-	if bvn, ok := kycAggregate.GetBVN(); ok {
-		kycEntity.BVN = sql.NullString{String: *bvn, Valid: ok}
+	bvn, _ := kycAggregate.GetBVN()
+
+	if bvn != nil {
+		kycEntity.BVN = sql.NullString{String: *bvn, Valid: utils.IsValidStringPointer(bvn)}
 	}
 
-	if bankCode, ok := kycAggregate.GetBankCode(); ok {
-		kycEntity.BankCode = sql.NullString{String: *bankCode, Valid: ok}
+	bankCode, _ := kycAggregate.GetBankCode()
+	{
+
+		if bankCode != nil {
+			kycEntity.BankCode = sql.NullString{String: *bankCode, Valid: utils.IsValidStringPointer(bankCode)}
+		}
+
 	}
 
-	if ownerId, ok := kycAggregate.GetOwnerId(); ok {
+	ownerId, _ := kycAggregate.GetOwnerId()
+
+	if ownerId != nil {
 		kycEntity.OwnerId = *ownerId
 	}
 
@@ -109,38 +98,38 @@ func BankingKycAggregateToPersistence(kycAggregate aggregates.BankingKYC) (*enti
 	kycEntity.CreatedBy = kycAggregate.GetCreatedBy()
 	kycEntity.UpdatedBy = kycAggregate.GetUpdatedBy()
 
-	return &kycEntity, nil
+	return kycEntity
 }
 
-func BankingKycAggregateToViewModel(kycAggregate aggregates.BankingKYC) (*dtos.BankingKycViewModel, error) {
+func BankingKycAggregateToViewModel(kycAggregate aggregates.BankingKYC) dtos.BankingKycViewModel {
 
 	kycEntity := dtos.BankingKycViewModel{}
 
-	if id, ok := kycAggregate.GetId(); ok {
+	if id, error := kycAggregate.GetId(); error == nil {
 		kycEntity.Id = *id
 	}
 
-	if name, ok := kycAggregate.GetName(); ok {
+	if name, error := kycAggregate.GetName(); error == nil {
 		kycEntity.Name = *name
 	}
 
-	if acctName, ok := kycAggregate.GetBankAccountName(); ok {
+	if acctName, error := kycAggregate.GetBankAccountName(); error == nil {
 		kycEntity.BankAccountName = acctName
 	}
 
-	if acctNo, ok := kycAggregate.GetBankAccountNumber(); ok {
+	if acctNo, error := kycAggregate.GetBankAccountNumber(); error == nil {
 		kycEntity.BankAccountNumber = acctNo
 	}
 
-	if bvn, ok := kycAggregate.GetBVN(); ok {
+	if bvn, error := kycAggregate.GetBVN(); error == nil {
 		kycEntity.BVN = bvn
 	}
 
-	if bankCode, ok := kycAggregate.GetBankCode(); ok {
+	if bankCode, error := kycAggregate.GetBankCode(); error == nil {
 		kycEntity.BankCode = bankCode
 	}
 
-	if ownerId, ok := kycAggregate.GetOwnerId(); ok {
+	if ownerId, error := kycAggregate.GetOwnerId(); error == nil {
 		kycEntity.OwnerId = *ownerId
 	}
 
@@ -151,5 +140,39 @@ func BankingKycAggregateToViewModel(kycAggregate aggregates.BankingKYC) (*dtos.B
 	kycEntity.CreatedBy = kycAggregate.GetCreatedBy()
 	kycEntity.UpdatedBy = kycAggregate.GetUpdatedBy()
 
-	return &kycEntity, nil
+	return kycEntity
 }
+
+// func BankingKycEntityToViewModel(kycEntity entities.BankingKycEntity) aggregates.BankingKYC {
+
+// 	kycAggregate := aggregates.BankingKYC{}
+
+// 	kycAggregate.SetId(&kycEntity.Id)
+// 	kycAggregate.SetName(&kycEntity.Name)
+// 	kycAggregate.SetOwnerId(&kycEntity.OwnerId)
+// 	kycAggregate.SetVerificationStatus(kycEntity.Verified)
+
+// 	if kycEntity.BankAccountName.Valid {
+// 		kycAggregate.SetBankAccountName(&kycEntity.BankAccountName.String)
+// 	}
+
+// 	if kycEntity.BankAccountNumber.Valid {
+// 		kycAggregate.SetBankAccountNumber(&kycEntity.BankAccountNumber.String)
+// 	}
+
+// 	if kycEntity.BVN.Valid {
+// 		kycAggregate.SetBVN(&kycEntity.BVN.String)
+// 	}
+
+// 	if kycEntity.BankCode.Valid {
+// 		kycAggregate.SetBankCode(&kycEntity.BankCode.String)
+// 	}
+
+// 	kycAggregate.AuditData.SetCreatedAt(kycEntity.CreatedAt)
+// 	kycAggregate.AuditData.SetUpdatedAt(kycEntity.UpdateAt)
+// 	kycAggregate.AuditData.SetUpdatedBy(kycEntity.CreatedBy)
+// 	kycAggregate.AuditData.SetUpdatedBy(kycEntity.UpdatedBy)
+
+// 	return kycAggregate
+
+// }
