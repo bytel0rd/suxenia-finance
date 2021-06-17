@@ -2,15 +2,17 @@ package entities
 
 import (
 	"database/sql"
+	"errors"
 	"suxenia-finance/pkg/common/persistence"
+	"suxenia-finance/pkg/common/utils"
 
 	"github.com/google/uuid"
 )
 
 type BankingKycEntity struct {
-	Id string
+	Id string `validate:"required,uuid"`
 
-	Name string
+	Name string `validate:"required"`
 
 	BankAccountName sql.NullString `db:"bank_account_name"`
 
@@ -20,16 +22,24 @@ type BankingKycEntity struct {
 
 	BankCode sql.NullString `db:"bank_code"`
 
-	OwnerId string `db:"owner_id"`
+	OwnerId string `db:"owner_id" validate:"required"`
 
-	Verified bool
+	Verified bool `validate:"omitempty"`
 
 	persistence.AuditInfo
 }
 
-func (kyc *BankingKycEntity) Validate() (error, bool) {
+func (kyc *BankingKycEntity) Validate() (bool, error) {
 
-	return nil, true
+	if status, validationErrors := utils.Validate(kyc); !status {
+
+		validations := *validationErrors
+
+		return false, errors.New(validations[0].Message)
+
+	}
+
+	return true, nil
 
 }
 

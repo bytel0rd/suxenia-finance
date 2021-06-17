@@ -51,7 +51,7 @@ func (p *VirtualAccount) GetOwnerId() string {
 
 func (p *VirtualAccount) SetOwnerId(id string) error {
 
-	if utils.IsValidString(&id) {
+	if utils.IsValidString(id) {
 		p.ownerId = id
 		return nil
 	}
@@ -70,7 +70,7 @@ func (p *VirtualAccount) SetProvider(provider enums.VirtualAccountProvider) {
 
 func (p *VirtualAccount) GetAccountName() (*string, bool) {
 
-	if p.accountName != nil && utils.IsValidString(p.accountName) {
+	if p.accountName != nil && utils.IsValidStringPointer(p.accountName) {
 		return p.accountName, true
 	}
 
@@ -79,7 +79,7 @@ func (p *VirtualAccount) GetAccountName() (*string, bool) {
 
 func (p *VirtualAccount) SetAccountName(acctName *string) error {
 
-	if utils.IsValidString(acctName) {
+	if utils.IsValidStringPointer(acctName) {
 		p.accountName = acctName
 		return nil
 	}
@@ -89,7 +89,7 @@ func (p *VirtualAccount) SetAccountName(acctName *string) error {
 
 func (p *VirtualAccount) GetAccountNumber() (*string, bool) {
 
-	if p.accountNumber != nil && utils.IsValidString(p.accountNumber) {
+	if p.accountNumber != nil && utils.IsValidStringPointer(p.accountNumber) {
 		return p.accountNumber, true
 	}
 
@@ -98,7 +98,7 @@ func (p *VirtualAccount) GetAccountNumber() (*string, bool) {
 
 func (p *VirtualAccount) SetAccountNumber(number *string) error {
 
-	if utils.IsValidString(number) && len(*number) == 10 {
+	if utils.IsValidStringPointer(number) && len(*number) == 10 {
 		p.accountNumber = number
 		return nil
 	}

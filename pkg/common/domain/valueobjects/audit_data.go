@@ -40,7 +40,7 @@ func (data *AuditData) SetUpdatedBy(name string) error {
 		return errors.New("missing parameter: updateName is required ")
 	}
 
-	data.createdBy = name
+	data.updatedBy = name
 
 	return nil
 }

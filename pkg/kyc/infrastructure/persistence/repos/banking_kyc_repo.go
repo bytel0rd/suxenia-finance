@@ -1,96 +1,94 @@
 package repos
 
 import (
-	"errors"
-	"fmt"
-	"suxenia-finance/pkg/kyc/infrastructure/persistence/entities"
+	"suxenia-finance/pkg/common/structs"
+	kycAggregates "suxenia-finance/pkg/kyc/domain/aggregates"
+	"suxenia-finance/pkg/kyc/infrastructure/persistence/drivers"
+	"suxenia-finance/pkg/kyc/mappers"
 
 	"github.com/jmoiron/sqlx"
 )
 
-type BankKycRepo struct {
-	db *sqlx.DB
-}
+func NewBankycRepo(db *sqlx.DB) (*BankingKycRepo, error) {
+	driver, error := drivers.NewBankycDriver(db)
 
-func (b *BankKycRepo) Create(kyc entities.BankingKycEntity) (*entities.BankingKycEntity, error) {
-
-	// how to autogenrate via tags or reflection capacblites.
-
-	_, err := b.db.NamedExec(
-
-		`INSERT INTO banking_kyc (
-			id, name, bank_account_name, bank_account_number, bvn, bank_code, owner_id, verified, created_by, updated_by, created_at, updated_at
-		)
-		VALUES (
-			:id, :name, :bank_account_name, :bank_account_number, :bvn, :bank_code, :owner_id, :verified, :created_by, :updated_by, :created_at, :updated_at
-		)`, kyc)
-
-	if err != nil {
-		return nil, err
+	if error != nil {
+		return nil, error
 	}
 
-	return &kyc, nil
+	return &BankingKycRepo{
+		driver: driver,
+	}, nil
 }
 
-func (b *BankKycRepo) FindById(id string) (*entities.BankingKycEntity, error) {
-
-	kyc := entities.BankingKycEntity{}
-
-	err := b.db.Get(&kyc, "SELECT * FROM banking_kyc WHERE id = $1", id)
-
-	if err != nil {
-		fmt.Println(err)
-		return nil, nil
-	}
-
-	return &kyc, nil
+type BankingKycRepo struct {
+	driver *drivers.BankKycDriver
 }
 
-func (b *BankKycRepo) Update(kyc *entities.BankingKycEntity) (*entities.BankingKycEntity, error) {
+func (r *BankingKycRepo) RetrieveById(id string) (*kycAggregates.BankingKYC, bool, *structs.DBException) {
 
-	_, err := b.db.NamedExec(
-		`UPDATE banking_kyc SET
-			id = :id 
-			name = :name 
-			bank_account_name = :bank_account_name  
-			bank_account_number = :bank_account_number
-			bvn = :bvn 
-			bank_code = :bank_code 
-			owner_id = :owner_id 
-			verified = :verified 
-			created_by = :created_by 
-			updated_by =  :updated_by 
-			created_at = :created_at
-			updated_at = :updated_at
-		WHERE
-			id = :id
-		`, kyc)
+	kycEntity, error := r.driver.FindById(id)
 
-	if err != nil {
-		return nil, err
+	if error == nil && kycEntity == nil {
+		return nil, false, nil
 	}
 
-	return kyc, nil
+	if error != nil {
+		return nil, false, error
+	}
+
+	kycAggregate := mappers.BankingKycAggregateFromPersistence(*kycEntity)
+
+	return &kycAggregate, true, nil
 
 }
 
-func (b *BankKycRepo) Delete(id string) (bool, error) {
+func (r *BankingKycRepo) Create(bankingKyc kycAggregates.BankingKYC) (*kycAggregates.BankingKYC, *structs.DBException) {
 
-	_, err := b.db.Exec("delete from banking_kyc where id = $1", id)
+	bankingKycEntity := mappers.BankingKycAggregateToPersistence(bankingKyc)
 
-	if err != nil {
-		return false, err
+	savedbankingKycEntity, error := r.driver.Create(bankingKycEntity)
+
+	if error != nil {
+		return nil, error
 	}
 
-	return true, nil
+	bankingKyc = mappers.BankingKycAggregateFromPersistence(*savedbankingKycEntity)
+
+	return &bankingKyc, nil
 }
 
-func NewBankycRepo(db *sqlx.DB) (*BankKycRepo, error) {
+func (r *BankingKycRepo) Update(bankingKyc kycAggregates.BankingKYC) (*kycAggregates.BankingKYC, *structs.DBException) {
 
-	if db == nil {
-		return nil, errors.New("cannot create banking repo due to invalid connection provided")
+	bankingKycEntity := mappers.BankingKycAggregateToPersistence(bankingKyc)
+
+	updatedKycEntity, error := r.driver.Update(bankingKycEntity)
+
+	if error != nil {
+
+		return nil, error
 	}
 
-	return &BankKycRepo{db}, nil
+	bankingKyc = mappers.BankingKycAggregateFromPersistence(*updatedKycEntity)
+
+	return &bankingKyc, nil
+}
+
+func (r *BankingKycRepo) Delete(id string) (bool, *structs.DBException) {
+
+	_, error := r.driver.FindById(id)
+
+	if error != nil {
+		return false, error
+	}
+
+	status, error := r.driver.Delete(id)
+
+	if error != nil {
+
+		return false, error
+	}
+
+	return status, nil
 
 }

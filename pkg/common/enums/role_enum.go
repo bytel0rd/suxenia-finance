@@ -16,9 +16,12 @@ func (role Role) IsSuperAdmin() bool {
 }
 
 func (role Role) IsOrgAdmin() bool {
-	switch role {
-	case ORG_ADMIN:
-	case SUPER_ADMIN:
+
+	if role == SUPER_ADMIN {
+		return true
+	}
+
+	if role == ORG_ADMIN {
 		return true
 	}
 

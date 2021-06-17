@@ -29,7 +29,7 @@ func (profile *AuthorizeProfile) SetEmail(email objects.Email) error {
 
 func (profile *AuthorizeProfile) GetFullName() (*string, bool) {
 
-	if utils.IsValidString(&profile.fullName) {
+	if utils.IsValidString(profile.fullName) {
 		return &profile.fullName, true
 	}
 
@@ -37,7 +37,11 @@ func (profile *AuthorizeProfile) GetFullName() (*string, bool) {
 }
 
 func (profile *AuthorizeProfile) SetFullName(name string) error {
-	if utils.IsValidString(&profile.fullName) {
+
+	if name != "" {
+
+		profile.fullName = name
+
 		return nil
 	}
 
@@ -45,7 +49,7 @@ func (profile *AuthorizeProfile) SetFullName(name string) error {
 }
 
 func (profile *AuthorizeProfile) HasProfileId() bool {
-	return utils.IsValidString(&profile.id)
+	return utils.IsValidString(profile.id)
 }
 
 func (profile *AuthorizeProfile) GetProfileId() (*string, bool) {
@@ -59,7 +63,7 @@ func (profile *AuthorizeProfile) GetProfileId() (*string, bool) {
 
 func (profile *AuthorizeProfile) SetProfileId(profileId string) error {
 
-	if utils.IsValidString(&profileId) {
+	if utils.IsValidString(profileId) {
 		profile.id = profileId
 		return nil
 	}
@@ -81,7 +85,7 @@ func (profile *AuthorizeProfile) SetPermissions(permissions objects.Permissions)
 
 func (profile *AuthorizeProfile) HasOrgId() bool {
 
-	return utils.IsValidString(&profile.orgId)
+	return utils.IsValidString(profile.orgId)
 }
 
 func (profile *AuthorizeProfile) GetOrgId() (*string, bool) {
@@ -95,7 +99,7 @@ func (profile *AuthorizeProfile) GetOrgId() (*string, bool) {
 
 func (profile *AuthorizeProfile) SetOrgId(orgId string) error {
 
-	if utils.IsValidString(&orgId) {
+	if utils.IsValidString(orgId) {
 		profile.orgId = orgId
 		return nil
 	}

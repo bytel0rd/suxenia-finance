@@ -27,7 +27,7 @@ func (p Permissions) Include(permission string) bool {
 	return includes
 }
 
-func (p Permissions) Remove(permission string) {
+func (p *Permissions) Remove(permission string) {
 
 	filter := []string{}
 
@@ -47,13 +47,8 @@ func NewPermission() Permissions {
 	return Permissions{}
 }
 
-func NewPermissionFromStrings(perms *[]string) Permissions {
-
-	if perms == nil {
-		return NewPermission()
-	}
-
+func NewPermissionFromStrings(perms []string) Permissions {
 	return Permissions{
-		perms: *perms,
+		perms: perms,
 	}
 }
