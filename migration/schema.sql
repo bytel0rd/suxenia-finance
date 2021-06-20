@@ -76,3 +76,56 @@ CREATE TABLE wallet_transactions (
 	created_at timestamp with time zone NOT NULL DEFAULT current_timestamp,
 	updated_at timestamp with time zone NOT NULL DEFAULT current_timestamp
 ) 
+
+
+CREATE TABLE payments (
+    id varchar(144) UNIQUE primary key,
+
+    processed_by varchar(144) NOT NULL,
+	amount int NOT NULL,
+	opening_balance int,
+
+	status varchar(144) NOT NULL,
+	transaction_reference varchar(144) UNIQUE NOT NULL,
+
+	transaction_source varchar(144) NOT NULL,
+	source_reference varchar(144) UNIQUE NOT NULL,
+    
+	platform varchar(144) NOT NULL,
+	comments varchar(144),
+
+	owner_id varchar(144) NOT NULL,
+	
+	created_by varchar(144) NOT NULL,
+	updated_by varchar(144) NOT NULL,
+	
+	created_at timestamp with time zone NOT NULL DEFAULT current_timestamp,
+	updated_at timestamp with time zone NOT NULL DEFAULT current_timestamp
+) 
+
+
+CREATE TABLE withdrawals (
+    id varchar(144) UNIQUE primary key,
+
+    processed_by varchar(144) NOT NULL,
+	amount int NOT NULL,
+	opening_balance int NOT NULL,
+
+	transaction_reference varchar(144) UNIQUE NOT NULL,
+	transaction_source varchar(144) UNIQUE NOT NULL,
+	source_reference varchar(144) UNIQUE NOT NULL,
+    
+	platform varchar(144) NOT NULL,
+    
+	approvedBy varchar(144),
+	status varchar(144) NOT NULL,
+	comments varchar(144),
+
+	owner_id varchar(144) NOT NULL,
+	
+	created_by varchar(144) NOT NULL,
+	updated_by varchar(144) NOT NULL,
+	
+	created_at timestamp with time zone NOT NULL DEFAULT current_timestamp,
+	updated_at timestamp with time zone NOT NULL DEFAULT current_timestamp
+) 
