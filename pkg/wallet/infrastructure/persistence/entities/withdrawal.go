@@ -2,39 +2,43 @@ package entities
 
 import (
 	"database/sql"
-	"time"
+	"suxenia-finance/pkg/common/persistence"
+
+	"github.com/google/uuid"
 )
 
 type Withdrawal struct {
-	Id string
+	Id string `db:"id" validate:"required,uuid"`
 
-	ProcessedBy string
+	ProcessedBy string `db:"processed_by" validate:"required"`
 
-	Amount int64
+	Amount int `db:"amount" validate:"required"`
 
-	OpeningBalance int64
+	OpeningBalance int `db:"opening_balance" validate:"required"`
 
-	TransactionReference string
+	TransactionReference string `db:"transaction_reference" validate:"required"`
 
-	TransactionSource sql.NullString
+	TransactionSource string `db:"transaction_source" validate:"omitempty"`
 
-	SourceReference sql.NullString
+	SourceReference string `db:"source_reference" validate:"omitempty"`
 
-	Platform string
+	Platform string `db:"platform" validate:"required"`
 
-	ApprovedBy string
+	ApprovedBy sql.NullString `db:"approved_by" validate:"omitempty"`
 
-	Status string
+	Status string `db:"status" validate:"required"`
 
-	Comment string
+	Comments string `db:"comments" validate:"omitempty"`
 
-	OwnerId string
+	OwnerId string `db:"owner_id" validate:"required"`
 
-	CreatedBy string
+	persistence.AuditInfo
+}
 
-	UpdatedBy string
-
-	CreatedAt time.Time
-
-	UpdateAt time.Time
+func NewWithdrawal(ownerId string, auditor string) Withdrawal {
+	return Withdrawal{
+		Id:        uuid.NewString(),
+		OwnerId:   ownerId,
+		AuditInfo: persistence.NewAuditInfo(auditor),
+	}
 }

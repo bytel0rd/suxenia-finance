@@ -11,9 +11,9 @@ type Wallet struct {
 
 	Id string `validate:"required,uuid" db:"id"`
 
-	TotalBalance int64 `db:"total_balance" validate:"required"`
+	TotalBalance int `db:"total_balance" validate:"required"`
 
-	AvailableBalance int64 `db:"available_balance" validate:"required"`
+	AvailableBalance int `db:"available_balance" validate:"required"`
 
 	Version int `db:"version" validate:"required"`
 

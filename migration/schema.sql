@@ -112,12 +112,12 @@ CREATE TABLE withdrawals (
 	opening_balance int NOT NULL,
 
 	transaction_reference varchar(144) UNIQUE NOT NULL,
-	transaction_source varchar(144) UNIQUE NOT NULL,
+	transaction_source varchar(144)  NOT NULL,
 	source_reference varchar(144) UNIQUE NOT NULL,
     
 	platform varchar(144) NOT NULL,
     
-	approvedBy varchar(144),
+	approved_by varchar(144),
 	status varchar(144) NOT NULL,
 	comments varchar(144),
 
