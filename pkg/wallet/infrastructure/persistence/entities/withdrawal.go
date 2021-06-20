@@ -1,6 +1,9 @@
 package entities
 
-import "time"
+import (
+	"database/sql"
+	"time"
+)
 
 type Withdrawal struct {
 	Id string
@@ -13,9 +16,9 @@ type Withdrawal struct {
 
 	TransactionReference string
 
-	TransactionSource string
+	TransactionSource sql.NullString
 
-	SourceReference string
+	SourceReference sql.NullString
 
 	Platform string
 

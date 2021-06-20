@@ -2,18 +2,30 @@ package entities
 
 import (
 	common "suxenia-finance/pkg/common/persistence"
+
+	"github.com/google/uuid"
 )
 
 type Wallet struct {
 	common.AuditInfo
 
-	Id int
+	Id string `validate:"required,uuid" db:"id"`
 
-	TotalBalance int64
+	TotalBalance int64 `db:"total_balance" validate:"required"`
 
-	AvailableBalance int64
+	AvailableBalance int64 `db:"available_balance" validate:"required"`
 
-	Version int
+	Version int `db:"version" validate:"required"`
 
-	OwnerId string
+	OwnerId string `db:"owner_id" validate:"required"`
+}
+
+func NewWallet(ownerId string, authorName string) Wallet {
+
+	return Wallet{
+		Id:        uuid.NewString(),
+		OwnerId:   ownerId,
+		AuditInfo: common.NewAuditInfo(authorName),
+	}
+
 }

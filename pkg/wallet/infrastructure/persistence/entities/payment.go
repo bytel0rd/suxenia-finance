@@ -1,6 +1,9 @@
 package entities
 
-import "time"
+import (
+	"database/sql"
+	"time"
+)
 
 type Payment struct {
 	Id string
@@ -13,9 +16,11 @@ type Payment struct {
 
 	TransactionReference string
 
-	TransactionSource string
+	Currency string
 
-	SourceReference string
+	TransactionSource sql.NullString
+
+	SourceReference sql.NullString
 
 	Platform string
 

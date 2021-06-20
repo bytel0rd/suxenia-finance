@@ -1,29 +1,48 @@
 package entities
 
-import "time"
+import (
+	"suxenia-finance/pkg/common/persistence"
+
+	"github.com/google/uuid"
+)
 
 type WalletTransaction struct {
-	Id string
+	Id string `db:"id" validate:"required,uuid"`
 
-	TransactionType string
+	TransactionType string `db:"transaction_type" validate:"required"`
 
-	TransactionReference string
+	TransactionReference string `db:"transaction_reference" validate:"required"`
 
-	Source string
+	Source string `db:"source" validate:"required"`
 
-	Amount int64
+	Amount int `db:"amount" validate:"required"`
 
-	OpeningBalance int64
+	OpeningBalance int `db:"opening_balance" validate:"required"`
 
-	Platform string
+	Platform string `db:"platform" validate:"required"`
 
-	OwnerId string
+	OwnerId string `db:"owner_id" validate:"required"`
 
-	CreatedBy string
+	Comments string `db:"comments" validate:"required"`
 
-	UpdatedBy string
+	persistence.AuditInfo
+}
 
-	CreatedAt time.Time
+func NewWalletTransaction(owner_id string, auditor string) WalletTransaction {
 
-	UpdateAt time.Time
+	audit := persistence.NewAuditInfo(auditor)
+
+	return WalletTransaction{
+		Id:                   uuid.NewString(),
+		TransactionType:      "",
+		TransactionReference: "",
+		Source:               "",
+		Amount:               0,
+		OpeningBalance:       0,
+		Platform:             "",
+		OwnerId:              owner_id,
+		Comments:             "",
+		AuditInfo:            audit,
+	}
+
 }
