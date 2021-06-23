@@ -1,35 +1,43 @@
 package entities
 
-import "time"
+import (
+	"database/sql"
+	"suxenia-finance/pkg/common/persistence"
+
+	"github.com/google/uuid"
+)
 
 type Payment struct {
-	Id string
+	Id string `db:"id" validate:"required"`
 
-	ProcessedBy string
+	ProcessedBy string `db:"processed_by" validate:"required"`
 
-	Amount int64
+	Amount int `db:"amount" validate:"required"`
 
-	OpeningBalance int64
+	OpeningBalance sql.NullInt32 `db:"opening_balance" validate:"omitempty"`
 
-	TransactionReference string
+	TransactionReference string `db:"transaction_reference" validate:"required"`
 
-	TransactionSource string
+	TransactionSource string `db:"transaction_source" validate:"omitempty"`
 
-	SourceReference string
+	SourceReference sql.NullString `db:"source_reference" validate:"omitempty"`
 
-	Platform string
+	Platform string `db:"platform" validate:"required"`
 
-	Status string
+	Status string `db:"status" validate:"required"`
 
-	Comment string
+	Comments string `db:"comments" validate:"required"`
 
-	OwnerId string
+	OwnerId string `db:"owner_id" validate:"required"`
 
-	CreatedBy string
+	persistence.AuditInfo
+}
 
-	UpdatedBy string
+func NewPayment(ownerId string, auditor string) Payment {
 
-	CreatedAt time.Time
-
-	UpdateAt time.Time
+	return Payment{
+		Id:        uuid.NewString(),
+		OwnerId:   ownerId,
+		AuditInfo: persistence.NewAuditInfo(auditor),
+	}
 }

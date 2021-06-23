@@ -1,8 +1,8 @@
 package aggregates
 
 import (
+	objects "suxenia-finance/pkg/common/domain/valueobjects"
 	"testing"
-	"time"
 
 	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/assert"
@@ -14,11 +14,8 @@ var wallet WalletAggregate = WalletAggregate{
 	availableBalance: decimal.NewFromInt(5),
 	version:          0,
 	ownerId:          "",
-	createdBy:        "",
-	updatedBy:        "",
-	createdAt:        time.Time{},
-	updateAt:         time.Time{},
 	modified:         false,
+	AuditData:        objects.AuditData{},
 }
 
 func ShouldThrowErrorWhileSettingAvailableBalance(t *testing.T) {
