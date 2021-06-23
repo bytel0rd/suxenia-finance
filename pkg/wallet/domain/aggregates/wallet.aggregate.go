@@ -74,3 +74,12 @@ func (w *WalletAggregate) updateAuditInfo() {
 	w.modified = true
 
 }
+
+func (w *WalletAggregate) GetVersion() int {
+
+	if w.modified {
+		return w.version + 1
+	}
+
+	return w.version
+}
