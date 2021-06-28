@@ -2,6 +2,7 @@ package drivers
 
 import (
 	"log"
+	"suxenia-finance/pkg/wallet/enums"
 	"suxenia-finance/pkg/wallet/infrastructure/persistence/entities"
 	"testing"
 
@@ -37,6 +38,7 @@ func TestCreateWalletTransaction(t *testing.T) {
 	walletTransaction.Amount = 50
 	walletTransaction.Comments = "Testing payment update with paystack"
 	walletTransaction.Platform = "MOBILE"
+	walletTransaction.Status = enums.PENDING
 
 	savedWalletTransaction, exception := WalletTransactionDriverInstance.Create(walletTransaction)
 
@@ -68,6 +70,7 @@ func TestUpdateWalletTransaction(t *testing.T) {
 	walletTransaction.Amount = 100
 	walletTransaction.Comments = "Testing payment update"
 	walletTransaction.Platform = "WEB"
+	walletTransaction.Status = enums.SUCCESS
 
 	savedWalletTransaction, exception := WalletTransactionDriverInstance.Update(*walletTransaction)
 

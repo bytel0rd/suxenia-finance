@@ -3,6 +3,8 @@ package entities
 import (
 	"database/sql"
 	"suxenia-finance/pkg/common/persistence"
+	"suxenia-finance/pkg/externals/payments"
+	"suxenia-finance/pkg/wallet/enums"
 
 	"github.com/google/uuid"
 )
@@ -10,7 +12,7 @@ import (
 type Payment struct {
 	Id string `db:"id" validate:"required"`
 
-	ProcessedBy string `db:"processed_by" validate:"required"`
+	ProcessedBy payments.Processor `db:"processed_by" validate:"required"`
 
 	Amount int `db:"amount" validate:"required"`
 
@@ -22,9 +24,9 @@ type Payment struct {
 
 	SourceReference sql.NullString `db:"source_reference" validate:"omitempty"`
 
-	Platform string `db:"platform" validate:"required"`
+	Platform enums.Platform `db:"platform" validate:"required"`
 
-	Status string `db:"status" validate:"required"`
+	Status enums.TransactionStatus `db:"status" validate:"required"`
 
 	Comments string `db:"comments" validate:"required"`
 

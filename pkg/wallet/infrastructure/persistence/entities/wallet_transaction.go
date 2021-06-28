@@ -2,6 +2,7 @@ package entities
 
 import (
 	"suxenia-finance/pkg/common/persistence"
+	"suxenia-finance/pkg/wallet/enums"
 
 	"github.com/google/uuid"
 )
@@ -15,11 +16,13 @@ type WalletTransaction struct {
 
 	Source string `db:"source" validate:"required"`
 
+	Status enums.TransactionStatus `db:"status" validate:"required"`
+
 	Amount int `db:"amount" validate:"required"`
 
 	OpeningBalance int `db:"opening_balance" validate:"required"`
 
-	Platform string `db:"platform" validate:"required"`
+	Platform enums.Platform `db:"platform" validate:"required"`
 
 	OwnerId string `db:"owner_id" validate:"required"`
 

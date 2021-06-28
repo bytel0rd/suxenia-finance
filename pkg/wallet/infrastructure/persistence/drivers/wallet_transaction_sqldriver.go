@@ -48,9 +48,9 @@ func (w *WalletTransactionDriver) Create(transaction entities.WalletTransaction)
 
 	rows, error := w.db.NamedQuery(
 		`INSERT INTO wallet_transactions 
-			(id, transaction_type, transaction_reference, source, amount, opening_balance, platform, owner_id, comments, created_by, created_at, updated_by, updated_at) 
+			(id, transaction_type, transaction_reference, source, status, amount, opening_balance, platform, owner_id, comments, created_by, created_at, updated_by, updated_at) 
 		VALUES 
-			(:id, :transaction_type, :transaction_reference, :source, :amount, :opening_balance, :platform, :owner_id, :comments, :created_by, :created_at, :updated_by, :updated_at) 
+			(:id, :transaction_type, :transaction_reference, :source, :status, :amount, :opening_balance, :platform, :owner_id, :comments, :created_by, :created_at, :updated_by, :updated_at) 
 		RETURNING *`, transaction)
 
 	if error != nil {
@@ -83,6 +83,7 @@ func (w *WalletTransactionDriver) Update(wallet entities.WalletTransaction) (*en
 			transaction_type = :transaction_type, 
 			transaction_reference = :transaction_reference,
 			source = :source, 
+			status = :status, 
 			amount = :amount, 
 			opening_balance = :opening_balance, 
 			platform = :platform, 

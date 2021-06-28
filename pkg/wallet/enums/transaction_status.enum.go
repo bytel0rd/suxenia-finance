@@ -1,23 +1,55 @@
 package enums
 
-type TransactionStatus int
+import "errors"
 
-const (
-	PENDING TransactionStatus = iota + 1
-	SUCCESS
-	FAILED
-	REJECTED
+type TransactionStatus string
+
+func newTransactionStatus(name string) TransactionStatus {
+	return TransactionStatus(name)
+}
+
+var (
+	PENDING    TransactionStatus = newTransactionStatus("PENDING")
+	SUCCESS    TransactionStatus = newTransactionStatus("SUCCESS")
+	FAILED     TransactionStatus = newTransactionStatus("FAILED")
+	REJECTED   TransactionStatus = newTransactionStatus("REJECTED")
+	PROCESSING TransactionStatus = newTransactionStatus("PROCESSING")
+	INITIATED  TransactionStatus = newTransactionStatus("INITIATED")
 )
 
-func (t *TransactionStatus) names() []string {
-	return []string{"PENDING", "SUCCESS", "FAILED", "REJECTED"}
+func (t *TransactionStatus) Name() string {
+	return string(*t)
 }
 
-func (t TransactionStatus) String() string {
+func ParseTransactionStatus(name string) (*TransactionStatus, error) {
+	switch name {
 
-	return t.names()[int(t)]
-}
+	case PENDING.Name():
 
-func (t TransactionStatus) Value() int {
-	return int(t)
+		return &PENDING, nil
+
+	case SUCCESS.Name():
+
+		return &SUCCESS, nil
+
+	case FAILED.Name():
+
+		return &FAILED, nil
+
+	case REJECTED.Name():
+
+		return &REJECTED, nil
+
+	case PROCESSING.Name():
+
+		return &PROCESSING, nil
+
+	case INITIATED.Name():
+
+		return &INITIATED, nil
+
+	}
+
+	return nil, errors.New("invalid transaction status")
+
 }
