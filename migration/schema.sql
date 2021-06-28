@@ -44,8 +44,9 @@ CREATE TABLE virtual_accounts (
 CREATE TABLE wallets (
 	id varchar(144) primary key,
 	
-	total_balance int NOT NULL default 0,
-	available_balance int NOT NULL default 0,
+	total_balance bigInt NOT NULL default 0,
+	available_balance bigInt NOT NULL default 0,
+
 	version int NOT NULL default 0,
 	owner_id varchar(144) NOT NULL,
 	
@@ -62,9 +63,10 @@ CREATE TABLE wallet_transactions (
     transaction_type varchar(144) NOT NULL,
 	transaction_reference varchar(144) UNIQUE NOT NULL,
 	source varchar(144) NOT NULL,
+	status varchar(144) NOT NULL,
 
-	amount int NOT NULL,
-	opening_balance int NOT NULL,
+	amount bigInt NOT NULL,
+	opening_balance bigInt NOT NULL,
     
 	platform varchar(144) NOT NULL,
 	owner_id varchar(144) NOT NULL,
@@ -82,8 +84,8 @@ CREATE TABLE payments (
     id varchar(144) UNIQUE primary key,
 
     processed_by varchar(144) NOT NULL,
-	amount int NOT NULL,
-	opening_balance int,
+	amount bigInt NOT NULL,
+	opening_balance bigInt,
 
 	status varchar(144) NOT NULL,
 	transaction_reference varchar(144) UNIQUE NOT NULL,
@@ -107,14 +109,14 @@ CREATE TABLE payments (
 CREATE TABLE withdrawals (
     id varchar(144) UNIQUE primary key,
 
-    processed_by varchar(144) NOT NULL,
-	amount int NOT NULL,
-	opening_balance int NOT NULL,
+	amount bigInt NOT NULL,
+	opening_balance bigInt NOT NULL,
 
 	transaction_reference varchar(144) UNIQUE NOT NULL,
 	transaction_source varchar(144)  NOT NULL,
 	source_reference varchar(144) UNIQUE NOT NULL,
     
+    processed_by varchar(144) NOT NULL,
 	platform varchar(144) NOT NULL,
     
 	approved_by varchar(144),

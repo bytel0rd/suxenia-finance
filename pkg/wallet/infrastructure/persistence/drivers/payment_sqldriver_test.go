@@ -121,3 +121,14 @@ func TestFindPaymentByOwnerId(t *testing.T) {
 	assert.IsType(t, savedPayment, new(entities.Payment))
 
 }
+
+func TestFindPaymentByReference(t *testing.T) {
+
+	transactionReference := "f5740aad-2045-4323-8203-043ab33d3b98"
+
+	savedPayment, exception := PaymentDriverInstance.FindByReference(transactionReference)
+
+	assert.Nil(t, exception)
+	assert.IsType(t, savedPayment, new(entities.Payment))
+
+}
