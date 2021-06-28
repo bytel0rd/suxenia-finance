@@ -1,21 +1,35 @@
 package enums
 
-type TransactionType int
+import "errors"
 
-const (
-	PAYMENT TransactionType = iota + 1
-	WITHDRAWAL
+type TransactionType string
+
+func newTransactionType(name string) TransactionType {
+	return TransactionType(name)
+}
+
+var (
+	PAYMENT    TransactionType = newTransactionType("PAYMENT")
+	WITHDRAWAL TransactionType = newTransactionType("WITHDRAWAL")
 )
 
-func (t *TransactionType) names() []string {
-	return []string{"PAYMENT", "WITHDRAWAL"}
+func (t *TransactionType) Name() string {
+	return string(*t)
 }
 
-func (t TransactionType) String() string {
+func ParseTransactionType(name string) (*TransactionType, error) {
+	switch name {
 
-	return t.names()[int(t)]
-}
+	case PAYMENT.Name():
 
-func (t TransactionType) Value() int {
-	return int(t)
+		return &PAYMENT, nil
+
+	case WITHDRAWAL.Name():
+
+		return &WITHDRAWAL, nil
+
+	}
+
+	return nil, errors.New("invalid transaction type selected")
+
 }
