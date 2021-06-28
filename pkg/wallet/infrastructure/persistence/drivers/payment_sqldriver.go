@@ -7,6 +7,7 @@ import (
 	"suxenia-finance/pkg/wallet/infrastructure/persistence/entities"
 
 	"github.com/jmoiron/sqlx"
+	"github.com/lib/pq"
 )
 
 type PaymentDriver struct {
@@ -135,5 +136,30 @@ func (w *PaymentDriver) Delete(paymentId string) (bool, *structs.DBException) {
 	}
 
 	return true, nil
+
+}
+
+func (w *PaymentDriver) FindByReference(reference string) (*entities.Payment, *structs.DBException) {
+
+	payment := entities.Payment{}
+
+	error := w.db.Get(&payment, `Select * from payments where transaction_reference = $1`, reference)
+
+	if error != nil {
+
+		if err, ok := error.(*pq.Error); ok {
+			utils.LoggerInstance.Error(err)
+
+			exception := structs.NewDBException(err, true)
+			return nil, &exception
+		}
+
+		utils.LoggerInstance.Error(error)
+
+		return nil, nil
+
+	}
+
+	return &payment, nil
 
 }
