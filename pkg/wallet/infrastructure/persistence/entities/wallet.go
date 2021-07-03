@@ -1,13 +1,13 @@
 package entities
 
 import (
-	common "suxenia-finance/pkg/common/persistence"
+	"suxenia-finance/pkg/common/persistence"
 
 	"github.com/google/uuid"
 )
 
 type Wallet struct {
-	common.AuditInfo
+	persistence.AuditInfo
 
 	Id string `validate:"required,uuid" db:"id"`
 
@@ -25,7 +25,7 @@ func NewWallet(ownerId string, authorName string) Wallet {
 	return Wallet{
 		Id:        uuid.NewString(),
 		OwnerId:   ownerId,
-		AuditInfo: common.NewAuditInfo(authorName),
+		AuditInfo: persistence.NewAuditInfo(authorName),
 	}
 
 }
