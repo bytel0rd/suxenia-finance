@@ -11,9 +11,10 @@ type IntitalizePaymentRequest struct {
 	Source          string  `json:"source" validate:"required"`
 	Email           *string `json:"email" validate:"omitempty,email"`
 	Amount          string  `json:"amount" validate:"required"`
+	OwnerId         *string `json:"ownerId" validate:"required"`
 
-	Gateway  string `json:"gateway" validate:"gateway"`
-	Platform string `json:"platform" validate:"platform"`
+	Gateway  string `json:"gateway" validate:"required"`
+	Platform string `json:"platform" validate:"required"`
 }
 
 type InitializedPayment struct {
@@ -24,6 +25,7 @@ type InitializedPayment struct {
 	Email                string  `json:"email"`
 	Amount               int     `json:"amount"`
 	AmountInMajor        float32 `json:"amountInMajor"`
+	OwnerId              string  `json:"ownerId"`
 
 	Gateway  payments.Processor `json:"gateway"`
 	Platform enums.Platform     `json:"platform"`
