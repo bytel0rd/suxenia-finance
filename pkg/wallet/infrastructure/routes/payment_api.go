@@ -16,9 +16,9 @@ type PaymentApi struct {
 	payment *application.PaymentApplication
 }
 
-func (self *PaymentApi) GetPaymentById(ctx *gin.Context) {
+func (api *PaymentApi) GetPaymentById(ctx *gin.Context) {
 
-	payment, exception := self.payment.RetrivePaymentById(ctx.Param("id"))
+	payment, exception := api.payment.RetrivePaymentById(ctx.Param("id"))
 
 	if exception != nil {
 
@@ -35,7 +35,7 @@ func (self *PaymentApi) GetPaymentById(ctx *gin.Context) {
 
 }
 
-func (self *PaymentApi) InitializePayment(ctx *gin.Context) {
+func (api *PaymentApi) InitializePayment(ctx *gin.Context) {
 
 	initializeRequest := dtos.IntitalizePaymentRequest{}
 
@@ -54,7 +54,57 @@ func (self *PaymentApi) InitializePayment(ctx *gin.Context) {
 		return
 	}
 
-	payment, exception := self.payment.IntitalizePayment(authProfile, initializeRequest)
+	if initializeRequest.OwnerId == nil {
+
+		userId, _ := authProfile.GetProfileId()
+
+		initializeRequest.OwnerId = userId
+
+	}
+
+	payment, exception := api.payment.IntitalizePayment(authProfile, initializeRequest)
+
+	if exception != nil {
+
+		ctx.JSON(exception.GetStatusCode(), exception)
+
+		return
+	}
+
+	response := structs.NewAPIResponse(payment, http.StatusOK)
+
+	ctx.JSON(response.GetStatusCode(), response)
+
+}
+
+func (api *PaymentApi) ConfirmPayment(ctx *gin.Context) {
+
+	confirmPaymentRequest := dtos.ConfirmPayment{}
+
+	authProfile := ctx.MustGet("user").(aggregates.AuthorizeProfile)
+
+	error := ctx.ShouldBindJSON(&confirmPaymentRequest)
+
+	if error != nil {
+
+		utils.LoggerInstance.Error(error)
+
+		exception := structs.NewBadRequestException(nil)
+
+		ctx.JSON(int(exception.GetStatusCode()), exception)
+
+		return
+	}
+
+	if confirmPaymentRequest.OwnerId == nil {
+
+		userId, _ := authProfile.GetProfileId()
+
+		confirmPaymentRequest.OwnerId = userId
+
+	}
+
+	payment, exception := api.payment.ConfirmPayment(authProfile, confirmPaymentRequest)
 
 	if exception != nil {
 

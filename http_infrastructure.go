@@ -8,6 +8,7 @@ import (
 	"suxenia-finance/pkg/common/utils"
 
 	kycRoutes "suxenia-finance/pkg/kyc/infrastructure/routes"
+	walletRoutes "suxenia-finance/pkg/wallet/infrastructure/routes"
 
 	"gopkg.in/dgrijalva/jwt-go.v3"
 
@@ -20,6 +21,9 @@ func mountHttpInfrastructure(r *gin.Engine) {
 	r.Use(authJWTMiddleWare)
 
 	kycRoutes.RegisterRoutes(r)
+
+	walletRoutes.RegisterRoutes(r)
+
 }
 
 func authJWTMiddleWare(r *gin.Context) {
