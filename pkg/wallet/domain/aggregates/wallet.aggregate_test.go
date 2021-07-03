@@ -118,7 +118,7 @@ func TestProcessWithrawal(t *testing.T) {
 	withdrawalRequest.Status = enums.INITIATED
 	withdrawalRequest.Comments = "Testing Withdrawal update with paystack"
 
-	withdrawal, transaction, err := wallet.ProcessWithdrawal(withdrawalRequest)
+	withdrawal, transaction, err := wallet.ProcessWithdrawal(withdrawalRequest, decimal.NewFromInt(1000))
 
 	fmt.Printf("available balance %v", wallet.availableBalance.BigInt())
 
@@ -239,3 +239,23 @@ func TestAprroveWithrawal(t *testing.T) {
 	assert.Nil(t, err)
 
 }
+
+// func (w *WalletAggregate) initiatedWithdrawalStatus() (*decimal.Decimal, *structs.APIException) {
+
+// 	limit := os.Getenv("auto_withdrawal_limit")
+
+// 	if limit == "" {
+// 		limit = "2000000"
+// 	}
+
+// 	automaticLimit, error := decimal.NewFromString(limit)
+
+// 	if error != nil {
+
+// 		exception := structs.NewInternalServerException(error)
+
+// 		return nil, &exception
+// 	}
+
+// 	return &automaticLimit, nil
+// }
