@@ -4,24 +4,29 @@ import (
 	"errors"
 	"fmt"
 	"suxenia-finance/pkg/common/persistence"
-	"suxenia-finance/pkg/common/utils"
 	"suxenia-finance/pkg/kyc/infrastructure/persistence/entities"
 
 	"github.com/jmoiron/sqlx"
+	"go.uber.org/zap"
 )
 
-func NewVirtualAccountDriver(db *sqlx.DB) (*VirtualAccountDriver, error) {
+func NewVirtualAccountDriver(db *sqlx.DB, logger *zap.SugaredLogger) (*VirtualAccountDriver, error) {
 
 	if db == nil {
 		return nil, errors.New("cannot create virtual account repo due to invalid connection provided")
 	}
 
-	return &VirtualAccountDriver{db}, nil
+	if logger == nil {
+		return nil, errors.New("cannot create virtual account repo due to missing logger instance")
+	}
+
+	return &VirtualAccountDriver{db, logger}, nil
 
 }
 
 type VirtualAccountDriver struct {
-	db *sqlx.DB
+	db     *sqlx.DB
+	logger *zap.SugaredLogger
 }
 
 func (b *VirtualAccountDriver) Create(kyc entities.VirtualAccountEntity) (*entities.VirtualAccountEntity, error) {
@@ -51,7 +56,7 @@ func (b VirtualAccountDriver) FindById(id string) (*entities.VirtualAccountEntit
 	if err != nil {
 
 		message := err.Error()
-		utils.LoggerInstance.Warn(
+		b.logger.Warn(
 			message,
 		)
 
@@ -100,7 +105,7 @@ func (b *VirtualAccountDriver) Update(kyc *entities.VirtualAccountEntity) (*enti
 		}
 	}
 
-	utils.LoggerInstance.Info(result)
+	b.logger.Info(result)
 
 	return &result, nil
 

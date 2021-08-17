@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"log"
 	"strings"
+	"suxenia-finance/pkg/common/infrastructure/logs"
 	"suxenia-finance/pkg/wallet/infrastructure/persistence/entities"
 	"testing"
 
@@ -21,7 +22,7 @@ func init() {
 		log.Fatalln(err)
 	}
 
-	PaymentDriverInstance, err = NewPaymentDriver(db)
+	PaymentDriverInstance, err = NewPaymentDriver(db, logs.NewLogger())
 
 }
 

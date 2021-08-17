@@ -19,7 +19,7 @@ type RedisCache struct {
 	rdb *redis.Client
 }
 
-func NewRedisCache() RedisCache {
+func NewRedisCache() Cache {
 
 	rdb := redis.NewClient(&redis.Options{
 		Addr:     "localhost:6379",
@@ -27,7 +27,7 @@ func NewRedisCache() RedisCache {
 		DB:       0,  // use default DB
 	})
 
-	return RedisCache{
+	return &RedisCache{
 		ctx: context.Background(),
 		rdb: rdb,
 	}

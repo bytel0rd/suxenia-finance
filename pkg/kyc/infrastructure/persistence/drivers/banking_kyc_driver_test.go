@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+	"suxenia-finance/pkg/common/infrastructure/logs"
 	"suxenia-finance/pkg/kyc/infrastructure/persistence/entities"
 
 	"testing"
@@ -26,7 +27,7 @@ func init() {
 	// 	db.Close()
 	// }()
 
-	BankKycDriverInstance, err = NewBankycDriver(db)
+	BankKycDriverInstance, err = NewBankycDriver(db, logs.NewLogger())
 
 }
 

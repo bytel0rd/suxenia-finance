@@ -20,15 +20,67 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/shopspring/decimal"
+	"go.uber.org/zap"
 )
 
+var verifyPayment payments.ConfirmPayment = func(processor payments.Processor, reference string) (*payments.VerifiedPayment, error) {
+
+	verified := payments.VerifiedPayment{
+		ProcessedBy:          processor,
+		Amount:               decimal.NewFromInt(1000),
+		TransactionReference: reference,
+	}
+
+	return &verified, nil
+}
+
 type PaymentApplication struct {
-	paymentDriver *drivers.PaymentDriver
-	verifyPayment payments.ConfirmPayment
-	// mail                    func(email string, payment entities.Payment) (bool, error)
+	paymentDriver           *drivers.PaymentDriver
+	verifyPayment           payments.ConfirmPayment
 	cache                   cache.Cache
 	walletRepo              *repos.WalletRepo
 	walletTransactionDriver *drivers.WalletTransactionDriver
+	logger                  *zap.SugaredLogger
+}
+
+// mail                    func(email string, payment entities.Payment) (bool, error)
+func NewPaymentApplication(paymentDriver *drivers.PaymentDriver,
+	cache cache.Cache,
+	walletRepo *repos.WalletRepo,
+	walletTransactionDriver *drivers.WalletTransactionDriver,
+	logger *zap.SugaredLogger,
+) (*PaymentApplication, error) {
+
+	if paymentDriver == nil {
+		return nil, errors.New("Payment driver  is missing for payment application instance")
+	}
+
+	if cache == nil {
+		return nil, errors.New("cache instance is missing for payment application instance")
+	}
+
+	if walletRepo == nil {
+		return nil, errors.New("wallet repo is missing for payment application instance")
+	}
+
+	if walletTransactionDriver == nil {
+		return nil, errors.New("wallet transaction driver  is missing for payment application instance")
+	}
+
+	if logger == nil {
+		return nil, errors.New("logger instance is missing for payment application instance")
+	}
+
+	app := PaymentApplication{
+		paymentDriver:           paymentDriver,
+		verifyPayment:           verifyPayment,
+		cache:                   cache,
+		walletRepo:              walletRepo,
+		walletTransactionDriver: walletTransactionDriver,
+		logger:                  logger,
+	}
+
+	return &app, nil
 }
 
 func (p *PaymentApplication) RetrivePaymentById(id string) (*entities.Payment,
@@ -103,7 +155,7 @@ func (p *PaymentApplication) cacheIntitializePayment(intializedPayment *dtos.Ini
 
 	if error != nil {
 
-		utils.LoggerInstance.Error(error)
+		p.logger.Error(error)
 
 		exception := structs.NewInternalServerException(internalServerError)
 
@@ -114,7 +166,7 @@ func (p *PaymentApplication) cacheIntitializePayment(intializedPayment *dtos.Ini
 
 	if error != nil {
 
-		utils.LoggerInstance.Error(error)
+		p.logger.Error(error)
 
 		exception := structs.NewInternalServerException(internalServerError)
 
@@ -123,7 +175,7 @@ func (p *PaymentApplication) cacheIntitializePayment(intializedPayment *dtos.Ini
 
 	if error != nil {
 
-		utils.LoggerInstance.Error(error)
+		p.logger.Error(error)
 
 		exception := structs.NewInternalServerException(internalServerError)
 
@@ -171,7 +223,7 @@ func (p *PaymentApplication) createInitializePaymentRequest(
 
 	if error != nil {
 
-		utils.LoggerInstance.Error(error)
+		p.logger.Error(error)
 
 		exception := structs.NewBadRequestException(errors.New("invalid amount provided"))
 
@@ -264,7 +316,7 @@ func (p *PaymentApplication) ConfirmPayment(
 
 	if exception != nil {
 
-		utils.LoggerInstance.Error(exception)
+		p.logger.Error(exception)
 
 		return p.savePaymentRecord(newPayment)
 	}
@@ -339,7 +391,7 @@ func (p *PaymentApplication) persistPaymentTransactionOrRollBack(
 		status, _ := p.paymentDriver.Delete(processedPayment.Id)
 
 		if !status {
-			utils.LoggerInstance.Error(
+			p.logger.Error(
 				"Payment transaction record could not be deleted to revert processing information",
 				processedPayment.Id,
 			)
@@ -360,7 +412,7 @@ func (p *PaymentApplication) persistPaymentTransactionOrRollBack(
 		status, _ := p.paymentDriver.Delete(processedPayment.Id)
 
 		if !status {
-			utils.LoggerInstance.Error(
+			p.logger.Error(
 				"Payment transaction record could not be deleted to revert processing information",
 				processedPayment.Id,
 			)
@@ -369,7 +421,7 @@ func (p *PaymentApplication) persistPaymentTransactionOrRollBack(
 		status, _ = p.walletTransactionDriver.Delete(walletTransaction.Id)
 
 		if !status {
-			utils.LoggerInstance.Error(
+			p.logger.Error(
 				"Wallet transaction could not be deleted to revert processing information",
 				processedPayment.Id,
 			)
@@ -446,7 +498,7 @@ func (p *PaymentApplication) retrieveCachedIntializePaymentInformation(
 
 	if error != nil {
 
-		utils.LoggerInstance.Error(error)
+		p.logger.Error(error)
 
 		exception := structs.NewInternalServerException(error)
 
@@ -469,7 +521,7 @@ func (p *PaymentApplication) retrieveCachedIntializePaymentInformation(
 
 	if error != nil {
 
-		utils.LoggerInstance.Error(error)
+		p.logger.Error(error)
 
 		exception := structs.NewInternalServerException(
 			errors.New("error occurred during payment confirmation, please try again later"),
@@ -491,7 +543,7 @@ func (p *PaymentApplication) isPaymentAlreadyProcessed(
 
 	if dbException != nil {
 
-		utils.LoggerInstance.Error(dbException)
+		p.logger.Error(dbException)
 
 		exception := structs.NewInternalServerException(
 			errors.New("error occurred during payment confirmation, please try again later"),
@@ -542,7 +594,7 @@ func (p *PaymentApplication) getVerifiedPayment(
 
 	if error != nil {
 
-		utils.LoggerInstance.Error(error)
+		p.logger.Error(error)
 
 		exception := structs.NewAPIExceptionFromString(
 			"Payment verification failed, please try again later.",
@@ -559,7 +611,7 @@ func (p *PaymentApplication) getVerifiedPayment(
 
 	if error != nil {
 
-		utils.LoggerInstance.Error(error)
+		p.logger.Error(error)
 
 		exception := structs.NewAPIExceptionFromString(
 			"Payment verification failed from processor, please try again later.",

@@ -5,24 +5,22 @@ import (
 	"strings"
 	"suxenia-finance/pkg/common/mappers"
 	"suxenia-finance/pkg/common/structs"
-	"suxenia-finance/pkg/common/utils"
-
-	kycRoutes "suxenia-finance/pkg/kyc/infrastructure/routes"
-	walletRoutes "suxenia-finance/pkg/wallet/infrastructure/routes"
 
 	"gopkg.in/dgrijalva/jwt-go.v3"
 
 	"github.com/gin-gonic/gin"
 	"github.com/mitchellh/mapstructure"
+
+	kycRoute "suxenia-finance/pkg/kyc/infrastructure/routes"
+	walletRoute "suxenia-finance/pkg/wallet/infrastructure/routes"
 )
 
-func mountHttpInfrastructure(r *gin.Engine) {
+func mountHttpInfrastructure(r *gin.Engine, app *Application) {
 
 	r.Use(authJWTMiddleWare)
 
-	kycRoutes.RegisterRoutes(r)
-
-	walletRoutes.RegisterRoutes(r)
+	kycRoute.RegisterRoutes(r, app.kyc)
+	walletRoute.RegisterRoutes(r, app.payment)
 
 }
 
@@ -64,7 +62,7 @@ func authJWTMiddleWare(r *gin.Context) {
 
 	if error != nil {
 
-		utils.LoggerInstance.Error(error)
+		// utils.LoggerInstance.Error(error)
 
 		exception := structs.NewUnAuthorizedException(nil)
 
@@ -79,7 +77,7 @@ func authJWTMiddleWare(r *gin.Context) {
 
 	if error != nil {
 
-		utils.LoggerInstance.Error(error)
+		// utils.LoggerInstance.Error(error)
 
 		exception := structs.NewUnAuthorizedException(nil)
 
@@ -92,7 +90,7 @@ func authJWTMiddleWare(r *gin.Context) {
 
 	if exception != nil {
 
-		utils.LoggerInstance.Error(exception)
+		// utils.LoggerInstance.Error(exception)
 
 		r.AbortWithStatusJSON(exception.GetStatusCode(), exception)
 

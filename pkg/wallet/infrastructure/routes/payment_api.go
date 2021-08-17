@@ -1,19 +1,43 @@
 package routes
 
 import (
+	"errors"
 	"net/http"
 	"suxenia-finance/pkg/common/domain/aggregates"
 	"suxenia-finance/pkg/common/structs"
-	"suxenia-finance/pkg/common/utils"
 	"suxenia-finance/pkg/wallet/application"
 	"suxenia-finance/pkg/wallet/dtos"
 	"suxenia-finance/pkg/wallet/mappers"
 
 	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 )
 
 type PaymentApi struct {
 	payment *application.PaymentApplication
+	logger  *zap.SugaredLogger
+}
+
+func NewPaymentApi(
+	payment *application.PaymentApplication,
+	logger *zap.SugaredLogger,
+) (*PaymentApi, error) {
+
+	if payment == nil {
+		return nil, errors.New("missing payment appication instance is required to create paymentAPI")
+	}
+
+	if logger == nil {
+		return nil, errors.New("missing logger instance is required to create paymentAPI")
+	}
+
+	api := PaymentApi{
+		payment: payment,
+		logger:  logger,
+	}
+
+	return &api, nil
+
 }
 
 func (api *PaymentApi) GetPaymentById(ctx *gin.Context) {
@@ -45,7 +69,7 @@ func (api *PaymentApi) InitializePayment(ctx *gin.Context) {
 
 	if error != nil {
 
-		utils.LoggerInstance.Error(error)
+		api.logger.Error(error)
 
 		exception := structs.NewBadRequestException(nil)
 
@@ -87,7 +111,7 @@ func (api *PaymentApi) ConfirmPayment(ctx *gin.Context) {
 
 	if error != nil {
 
-		utils.LoggerInstance.Error(error)
+		api.logger.Error(error)
 
 		exception := structs.NewBadRequestException(nil)
 

@@ -3,6 +3,7 @@ package drivers
 import (
 	"fmt"
 	"log"
+	"suxenia-finance/pkg/common/infrastructure/logs"
 	"suxenia-finance/pkg/kyc/enums"
 	"suxenia-finance/pkg/kyc/infrastructure/persistence/entities"
 	"testing"
@@ -25,7 +26,7 @@ func init() {
 	// 	db.Close()
 	// }()
 
-	VirtualAccountDriverInstance, err = NewVirtualAccountDriver(db)
+	VirtualAccountDriverInstance, err = NewVirtualAccountDriver(db, logs.NewLogger())
 
 }
 

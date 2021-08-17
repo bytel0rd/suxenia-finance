@@ -5,20 +5,15 @@ import (
 	kycAggregates "suxenia-finance/pkg/kyc/domain/aggregates"
 	"suxenia-finance/pkg/kyc/infrastructure/persistence/drivers"
 	"suxenia-finance/pkg/kyc/mappers"
-
-	"github.com/jmoiron/sqlx"
 )
 
-func NewBankycRepo(db *sqlx.DB) (*BankingKycRepo, error) {
-	driver, error := drivers.NewBankycDriver(db)
+func NewBankycRepo(driver *drivers.BankKycDriver) (IBankingKycRepo, error) {
 
-	if error != nil {
-		return nil, error
+	repo := BankingKycRepo{
+		driver: driver,
 	}
 
-	return &BankingKycRepo{
-		driver: driver,
-	}, nil
+	return &repo, nil
 }
 
 type BankingKycRepo struct {

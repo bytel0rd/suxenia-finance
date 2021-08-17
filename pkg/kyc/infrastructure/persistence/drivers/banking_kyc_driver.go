@@ -6,15 +6,31 @@ import (
 	"fmt"
 	"suxenia-finance/pkg/common/persistence"
 	"suxenia-finance/pkg/common/structs"
-	"suxenia-finance/pkg/common/utils"
 	"suxenia-finance/pkg/kyc/infrastructure/persistence/entities"
 
 	"github.com/jmoiron/sqlx"
 	"github.com/lib/pq"
+	"go.uber.org/zap"
 )
 
 type BankKycDriver struct {
-	db *sqlx.DB
+	db     *sqlx.DB
+	logger *zap.SugaredLogger
+}
+
+func NewBankycDriver(db *sqlx.DB, logger *zap.SugaredLogger) (*BankKycDriver, error) {
+
+	if db == nil {
+		return nil, errors.New("cannot create banking repo due to invalid connection provided")
+	}
+
+	if logger == nil {
+		return nil, errors.New("cannot create banking repo due missing logger instance")
+
+	}
+
+	return &BankKycDriver{db, logger}, nil
+
 }
 
 func (b *BankKycDriver) Create(kyc entities.BankingKycEntity) (*entities.BankingKycEntity, *structs.DBException) {
@@ -36,13 +52,13 @@ func (b *BankKycDriver) Create(kyc entities.BankingKycEntity) (*entities.Banking
 		)`, kyc)
 
 	if err, ok := err.(*pq.Error); ok {
-		utils.LoggerInstance.Error(err)
+		b.logger.Error(err)
 	}
 
 	if err != nil {
 
 		pgError := err.(*pq.Error)
-		utils.LoggerInstance.Error(pgError)
+		b.logger.Error(pgError)
 
 		exception := structs.NewDBException(pgError, false)
 		return nil, &exception
@@ -61,7 +77,7 @@ func (b BankKycDriver) FindById(id string) (*entities.BankingKycEntity, *structs
 
 		message := err.Error()
 
-		utils.LoggerInstance.Warn(
+		b.logger.Warn(
 			message,
 		)
 
@@ -119,7 +135,7 @@ func (b *BankKycDriver) Update(kyc entities.BankingKycEntity) (*entities.Banking
 		}
 	}
 
-	utils.LoggerInstance.Info(result)
+	b.logger.Info(result)
 
 	return &result, nil
 
@@ -130,21 +146,11 @@ func (b *BankKycDriver) Delete(id string) (bool, *structs.DBException) {
 	_, err := b.db.Exec("delete from banking_kyc where id = $1", id)
 
 	if err != nil {
-		utils.LoggerInstance.Error(err)
+		b.logger.Error(err)
 
 		exception := structs.NewDBException(err, true)
 		return false, &exception
 	}
 
 	return true, nil
-}
-
-func NewBankycDriver(db *sqlx.DB) (*BankKycDriver, error) {
-
-	if db == nil {
-		return nil, errors.New("cannot create banking repo due to invalid connection provided")
-	}
-
-	return &BankKycDriver{db}, nil
-
 }

@@ -1,6 +1,7 @@
 package routes
 
 import (
+	"errors"
 	"net/http"
 	"suxenia-finance/pkg/common/domain/aggregates"
 	"suxenia-finance/pkg/common/structs"
@@ -10,11 +11,29 @@ import (
 	"suxenia-finance/pkg/kyc/mappers"
 
 	"github.com/gin-gonic/gin"
+	"go.uber.org/zap"
 )
 
-func GetBankingKycById(c *gin.Context) {
+type KycRoutes struct {
+	kyc    *application.BankingKYCApplication
+	logger *zap.SugaredLogger
+}
 
-	bankKyc, exception := application.BankingApplicationInstance.GetBankingKycById(c.Param("id"))
+func NewKycRoute(kyc *application.BankingKYCApplication, logger *zap.SugaredLogger) (*KycRoutes, error) {
+
+	if kyc == nil {
+		return nil, errors.New("error intializing kyc route, missing application.BankingKYCApplication provider")
+	}
+
+	routes := KycRoutes{kyc, logger}
+
+	return &routes, nil
+
+}
+
+func (r *KycRoutes) GetBankingKycById(c *gin.Context) {
+
+	bankKyc, exception := r.kyc.GetBankingKycById(c.Param("id"))
 
 	if exception != nil {
 
@@ -31,7 +50,7 @@ func GetBankingKycById(c *gin.Context) {
 
 }
 
-func CreateBankingKyc(c *gin.Context) {
+func (r *KycRoutes) CreateBankingKyc(c *gin.Context) {
 
 	createRequest := dtos.CreateBankKycDTO{}
 
@@ -41,7 +60,7 @@ func CreateBankingKyc(c *gin.Context) {
 
 	if error != nil {
 
-		utils.LoggerInstance.Error(error)
+		r.logger.Error(error)
 
 		exception := structs.NewBadRequestException(nil)
 
@@ -68,7 +87,7 @@ func CreateBankingKyc(c *gin.Context) {
 
 	}
 
-	bankKyc, exception := application.BankingApplicationInstance.CreateNewBankingKyc(authProfile, createRequest)
+	bankKyc, exception := r.kyc.CreateNewBankingKyc(authProfile, createRequest)
 
 	if exception != nil {
 
@@ -85,7 +104,7 @@ func CreateBankingKyc(c *gin.Context) {
 
 }
 
-func UpdateBankingKyc(c *gin.Context) {
+func (r *KycRoutes) UpdateBankingKyc(c *gin.Context) {
 
 	updateRequest := dtos.UpdateBankKycDTO{}
 
@@ -95,7 +114,7 @@ func UpdateBankingKyc(c *gin.Context) {
 
 	if error != nil {
 
-		utils.LoggerInstance.Error(error)
+		r.logger.Error(error)
 
 		exception := structs.NewBadRequestException(nil)
 
@@ -104,7 +123,7 @@ func UpdateBankingKyc(c *gin.Context) {
 		return
 	}
 
-	bankKyc, exception := application.BankingApplicationInstance.UpdateBankingKyc(authProfile, updateRequest)
+	bankKyc, exception := r.kyc.UpdateBankingKyc(authProfile, updateRequest)
 
 	if exception != nil {
 
@@ -121,7 +140,7 @@ func UpdateBankingKyc(c *gin.Context) {
 
 }
 
-func DeleteBankingKyc(c *gin.Context) {
+func (r *KycRoutes) DeleteBankingKyc(c *gin.Context) {
 
 	deleteRequest := dtos.DeleteBankKycDTO{}
 
@@ -131,7 +150,7 @@ func DeleteBankingKyc(c *gin.Context) {
 
 	if error != nil {
 
-		utils.LoggerInstance.Error(error)
+		r.logger.Error(error)
 
 		exception := structs.NewBadRequestException(nil)
 
@@ -140,7 +159,7 @@ func DeleteBankingKyc(c *gin.Context) {
 		return
 	}
 
-	status, exception := application.BankingApplicationInstance.DeleteBankingKycById(authProfile, deleteRequest)
+	status, exception := r.kyc.DeleteBankingKycById(authProfile, deleteRequest)
 
 	if exception != nil {
 
