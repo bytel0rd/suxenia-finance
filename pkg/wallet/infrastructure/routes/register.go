@@ -1,16 +1,10 @@
 package routes
 
 import (
-	"suxenia-finance/pkg/wallet/application"
-
 	"github.com/gin-gonic/gin"
 )
 
-func RegisterRoutes(router *gin.Engine) {
-
-	paymentApi := PaymentApi{
-		payment: application.PaymentApplicationInstance,
-	}
+func RegisterRoutes(router *gin.Engine, paymentApi *PaymentApi) {
 
 	paymentRouter := router.Group(`/api/v1/payments`)
 

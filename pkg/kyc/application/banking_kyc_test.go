@@ -5,6 +5,7 @@ import (
 	"net/http"
 	commonAggregates "suxenia-finance/pkg/common/domain/aggregates"
 	"suxenia-finance/pkg/common/enums"
+	"suxenia-finance/pkg/common/infrastructure/logs"
 	"suxenia-finance/pkg/common/structs"
 	"suxenia-finance/pkg/common/utils"
 	kycAggregates "suxenia-finance/pkg/kyc/domain/aggregates"
@@ -12,6 +13,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"go.uber.org/zap"
 )
 
 type BankRepoMock struct {
@@ -85,10 +87,12 @@ func NewMockAuthorizedProfile() commonAggregates.AuthorizeProfile {
 	return profile
 }
 
+var logger *zap.SugaredLogger = logs.NewLogger()
+
 func TestGetBankingKycByIdFatal(t *testing.T) {
 
 	repo := NewBankRepoMock(false)
-	bankApp, _ := NewBankingKycApplication(&repo)
+	bankApp, _ := NewBankingKycApplication(&repo, logger)
 
 	bankKyc, error := bankApp.GetBankingKycById("random-id")
 
@@ -100,7 +104,7 @@ func TestGetBankingKycByIdFatal(t *testing.T) {
 func TestGetBankingKycByIdNotFound(t *testing.T) {
 
 	repo := NewBankRepoMock(true)
-	bankApp, _ := NewBankingKycApplication(&repo)
+	bankApp, _ := NewBankingKycApplication(&repo, logger)
 
 	repo.fatal = true
 	bankKyc, error := bankApp.GetBankingKycById("random-id")
@@ -113,7 +117,7 @@ func TestGetBankingKycByIdNotFound(t *testing.T) {
 func TestGetBankingKycByIdSuccess(t *testing.T) {
 
 	repo := NewBankRepoMock(true)
-	bankApp, _ := NewBankingKycApplication(&repo)
+	bankApp, _ := NewBankingKycApplication(&repo, logger)
 
 	bankKyc, error := bankApp.GetBankingKycById("random-id")
 
@@ -125,7 +129,7 @@ func TestGetBankingKycByIdSuccess(t *testing.T) {
 func TestCreateNewBankingKycBadRequest(t *testing.T) {
 
 	repo := NewBankRepoMock(false)
-	bankApp, _ := NewBankingKycApplication(&repo)
+	bankApp, _ := NewBankingKycApplication(&repo, logger)
 
 	authProfile := NewMockAuthorizedProfile()
 	createRequest := dtos.CreateBankKycDTO{
@@ -147,7 +151,7 @@ func TestCreateNewBankingKycBadRequest(t *testing.T) {
 func TestCreateNewBankingKycDBBadRequest(t *testing.T) {
 
 	repo := NewBankRepoMock(false)
-	bankApp, _ := NewBankingKycApplication(&repo)
+	bankApp, _ := NewBankingKycApplication(&repo, logger)
 
 	authProfile := NewMockAuthorizedProfile()
 	createRequest := dtos.CreateBankKycDTO{
@@ -169,7 +173,7 @@ func TestCreateNewBankingKycDBBadRequest(t *testing.T) {
 func TestCreateNewBankingKySuccess(t *testing.T) {
 
 	repo := NewBankRepoMock(true)
-	bankApp, _ := NewBankingKycApplication(&repo)
+	bankApp, _ := NewBankingKycApplication(&repo, logger)
 
 	authProfile := NewMockAuthorizedProfile()
 	createRequest := dtos.CreateBankKycDTO{
@@ -190,7 +194,7 @@ func TestCreateNewBankingKySuccess(t *testing.T) {
 
 func TestUpdateBankingKycValidation(t *testing.T) {
 	repo := NewBankRepoMock(true)
-	bankApp, _ := NewBankingKycApplication(&repo)
+	bankApp, _ := NewBankingKycApplication(&repo, logger)
 
 	authProfile := NewMockAuthorizedProfile()
 	updateRequest := dtos.UpdateBankKycDTO{
@@ -211,7 +215,7 @@ func TestUpdateBankingKycValidation(t *testing.T) {
 
 func TestUpdateBankingKycDBError(t *testing.T) {
 	repo := NewBankRepoMock(false)
-	bankApp, _ := NewBankingKycApplication(&repo)
+	bankApp, _ := NewBankingKycApplication(&repo, logger)
 
 	authProfile := NewMockAuthorizedProfile()
 	updateRequest := dtos.UpdateBankKycDTO{
@@ -232,7 +236,7 @@ func TestUpdateBankingKycDBError(t *testing.T) {
 
 func TestUpdateBankingKycSuccess(t *testing.T) {
 	repo := NewBankRepoMock(true)
-	bankApp, _ := NewBankingKycApplication(&repo)
+	bankApp, _ := NewBankingKycApplication(&repo, logger)
 
 	authProfile := NewMockAuthorizedProfile()
 	updateRequest := dtos.UpdateBankKycDTO{
@@ -254,7 +258,7 @@ func TestUpdateBankingKycSuccess(t *testing.T) {
 
 func TestDeleteBankingKycByIdFailed(t *testing.T) {
 	repo := NewBankRepoMock(false)
-	bankApp, _ := NewBankingKycApplication(&repo)
+	bankApp, _ := NewBankingKycApplication(&repo, logger)
 
 	authProfile := NewMockAuthorizedProfile()
 	deleteRequest := dtos.DeleteBankKycDTO{
@@ -270,7 +274,7 @@ func TestDeleteBankingKycByIdFailed(t *testing.T) {
 
 func TestDeleteBankingKycByIdSuccess(t *testing.T) {
 	repo := NewBankRepoMock(true)
-	bankApp, _ := NewBankingKycApplication(&repo)
+	bankApp, _ := NewBankingKycApplication(&repo, logger)
 
 	authProfile := NewMockAuthorizedProfile()
 	deleteRequest := dtos.DeleteBankKycDTO{

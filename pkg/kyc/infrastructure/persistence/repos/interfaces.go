@@ -3,6 +3,9 @@ package repos
 import (
 	"suxenia-finance/pkg/common/structs"
 	kycAggregates "suxenia-finance/pkg/kyc/domain/aggregates"
+	"suxenia-finance/pkg/kyc/infrastructure/persistence/drivers"
+
+	"github.com/google/wire"
 )
 
 type IBankingKycRepo interface {
@@ -14,3 +17,5 @@ type IBankingKycRepo interface {
 
 	Delete(id string) (bool, *structs.DBException)
 }
+
+var BuildSet wire.ProviderSet = wire.NewSet(NewBankycRepo, drivers.BuildSet)

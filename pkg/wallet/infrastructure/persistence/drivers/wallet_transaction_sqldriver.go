@@ -3,23 +3,28 @@ package drivers
 import (
 	"errors"
 	"suxenia-finance/pkg/common/structs"
-	"suxenia-finance/pkg/common/utils"
 	"suxenia-finance/pkg/wallet/infrastructure/persistence/entities"
 
 	"github.com/jmoiron/sqlx"
+	"go.uber.org/zap"
 )
 
 type WalletTransactionDriver struct {
-	db *sqlx.DB
+	db     *sqlx.DB
+	logger *zap.SugaredLogger
 }
 
-func NewWalletTransactionDriver(db *sqlx.DB) (*WalletTransactionDriver, error) {
+func NewWalletTransactionDriver(db *sqlx.DB, logger *zap.SugaredLogger) (*WalletTransactionDriver, error) {
 
 	if db == nil {
 		return nil, errors.New("empty db instance while creating wallet transaction db driver")
 	}
 
-	driver := WalletTransactionDriver{db: db}
+	if logger == nil {
+		return nil, errors.New("missing logger instance while creating wallet transaction db driver")
+	}
+
+	driver := WalletTransactionDriver{db, logger}
 
 	return &driver, nil
 }
@@ -55,7 +60,7 @@ func (w *WalletTransactionDriver) Create(transaction entities.WalletTransaction)
 
 	if error != nil {
 
-		utils.LoggerInstance.Error(error)
+		w.logger.Error(error)
 		exception := structs.NewDBException(error, true)
 
 		return nil, &exception
@@ -64,7 +69,7 @@ func (w *WalletTransactionDriver) Create(transaction entities.WalletTransaction)
 	for rows.Next() {
 		err := rows.StructScan(&result)
 		if err != nil {
-			utils.LoggerInstance.Error(err)
+			w.logger.Error(err)
 		}
 	}
 
@@ -99,7 +104,7 @@ func (w *WalletTransactionDriver) Update(wallet entities.WalletTransaction) (*en
 
 	if error != nil {
 
-		utils.LoggerInstance.Error(error)
+		w.logger.Error(error)
 		exception := structs.NewDBException(error, true)
 
 		return nil, &exception
@@ -108,7 +113,7 @@ func (w *WalletTransactionDriver) Update(wallet entities.WalletTransaction) (*en
 	for rows.Next() {
 		err := rows.StructScan(&result)
 		if err != nil {
-			utils.LoggerInstance.Error(err)
+			w.logger.Error(err)
 		}
 	}
 

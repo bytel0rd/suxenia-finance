@@ -3,23 +3,28 @@ package drivers
 import (
 	"errors"
 	"suxenia-finance/pkg/common/structs"
-	"suxenia-finance/pkg/common/utils"
 	"suxenia-finance/pkg/wallet/infrastructure/persistence/entities"
 
 	"github.com/jmoiron/sqlx"
+	"go.uber.org/zap"
 )
 
 type WithdrawalDriver struct {
-	db *sqlx.DB
+	db     *sqlx.DB
+	logger *zap.SugaredLogger
 }
 
-func NewWithdrawalDriver(db *sqlx.DB) (*WithdrawalDriver, error) {
+func NewWithdrawalDriver(db *sqlx.DB, logger *zap.SugaredLogger) (*WithdrawalDriver, error) {
 
 	if db == nil {
 		return nil, errors.New("empty db instance while creating withdrawal db driver")
 	}
 
-	driver := WithdrawalDriver{db: db}
+	if logger == nil {
+		return nil, errors.New("missing logger instance while creating withdrawal db driver")
+	}
+
+	driver := WithdrawalDriver{db, logger}
 
 	return &driver, nil
 }
@@ -55,7 +60,7 @@ func (w *WithdrawalDriver) Create(withdrawal entities.Withdrawal) (*entities.Wit
 
 	if error != nil {
 
-		utils.LoggerInstance.Error(error)
+		w.logger.Error(error)
 		exception := structs.NewDBException(error, true)
 
 		return nil, &exception
@@ -64,7 +69,7 @@ func (w *WithdrawalDriver) Create(withdrawal entities.Withdrawal) (*entities.Wit
 	for rows.Next() {
 		err := rows.StructScan(&result)
 		if err != nil {
-			utils.LoggerInstance.Error(err)
+			w.logger.Error(err)
 		}
 	}
 
@@ -99,7 +104,7 @@ func (w *WithdrawalDriver) Update(withdrawal entities.Withdrawal) (*entities.Wit
 
 	if error != nil {
 
-		utils.LoggerInstance.Error(error)
+		w.logger.Error(error)
 		exception := structs.NewDBException(error, true)
 
 		return nil, &exception
@@ -108,7 +113,7 @@ func (w *WithdrawalDriver) Update(withdrawal entities.Withdrawal) (*entities.Wit
 	for rows.Next() {
 		err := rows.StructScan(&result)
 		if err != nil {
-			utils.LoggerInstance.Error(err)
+			w.logger.Error(err)
 		}
 	}
 

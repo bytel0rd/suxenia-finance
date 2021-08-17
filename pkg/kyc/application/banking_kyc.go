@@ -10,13 +10,16 @@ import (
 	kycAggregates "suxenia-finance/pkg/kyc/domain/aggregates"
 	"suxenia-finance/pkg/kyc/dtos"
 	"suxenia-finance/pkg/kyc/infrastructure/persistence/repos"
+
+	"go.uber.org/zap"
 )
 
 type BankingKYCApplication struct {
 	bankRepo repos.IBankingKycRepo
+	logger   *zap.SugaredLogger
 }
 
-func NewBankingKycApplication(bankRepo repos.IBankingKycRepo) (*BankingKYCApplication, error) {
+func NewBankingKycApplication(bankRepo repos.IBankingKycRepo, logger *zap.SugaredLogger) (*BankingKYCApplication, error) {
 
 	if bankRepo == nil {
 		return nil, errors.New("please provide a valid instance of bankRepo to create instance")
@@ -24,6 +27,7 @@ func NewBankingKycApplication(bankRepo repos.IBankingKycRepo) (*BankingKYCApplic
 
 	return &BankingKYCApplication{
 		bankRepo,
+		logger,
 	}, nil
 }
 
@@ -161,7 +165,7 @@ func (b *BankingKYCApplication) DeleteBankingKycById(profile commonAggregates.Au
 
 	if error != nil {
 
-		utils.LoggerInstance.Error(error)
+		b.logger.Error(error)
 
 		exception := structs.NewBadRequestException(error)
 

@@ -113,8 +113,6 @@ func Validate(value interface{}) (bool, *[]ValidatedFieldError) {
 			validationErrors = append(validationErrors, translatedMessage)
 		}
 
-		LoggerInstance.Error(translated)
-
 		return false, &validationErrors
 	}
 

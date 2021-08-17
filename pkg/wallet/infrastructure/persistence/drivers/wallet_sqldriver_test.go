@@ -2,6 +2,7 @@ package drivers
 
 import (
 	"log"
+	"suxenia-finance/pkg/common/infrastructure/logs"
 	"suxenia-finance/pkg/wallet/infrastructure/persistence/entities"
 	"testing"
 
@@ -23,7 +24,7 @@ func init() {
 	// 	db.Close()
 	// }()
 
-	walletDriverInstance, err = NewWalletDriver(db)
+	walletDriverInstance, err = NewWalletDriver(db, logs.NewLogger())
 
 }
 
